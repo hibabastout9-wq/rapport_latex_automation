@@ -1,0 +1,36 @@
+services:
+  # Service pour compiler le rapport une seule fois
+  latex-compiler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rapport_latex_abdellatif_gourri-latex-watch
+    container_name: rapport-atelier-latex-compiler
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+
+  # Service pour le développement avec surveillance des fichiers
+  latex-watch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rapport_latex_abdellatif_gourri-latex-watch
+    container_name: rapport-atelier-latex-watch
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: sh -lc "/workspace/watch.sh"
+    profiles:
+      - dev
+
+  # Service pour servir le PDF via un serveur web simple
+  pdf-server:
+    image: nginx:alpine
+    container_name: rapport-atelier-pdf-server
+    ports:
+      - "8082:80"
+    volumes:
+      - .:/usr/share/nginx/html:ro
+    profiles:
+      - server

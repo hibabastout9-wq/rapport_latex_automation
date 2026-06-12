@@ -1,0 +1,281 @@
+% !TeX program = xelatex
+\documentclass[12pt,a4paper]{rapportECL}
+
+% Informations pour la page de garde
+\title{Simulation hydraulique avec OpenFOAM\\Barrage AHL SOUSS (Ait M'zal)}
+\author{
+    \hspace{0.5cm}$\blacktriangleright$ Hiba BASTOUT\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ Asmae BOULEMKHARI\\[0.1cm]
+}
+\date{\today}
+\establishment{\textbf{Ecole Hassania des Travaux Publics}}
+\department{Génie de l'Eau et de l'Environnement}
+\filiere{Génie de l'Eau}
+
+\supervisor{
+    \hspace{0.5cm}$\blacktriangleright$ Encadrante interne : Mme AHATTAB Jihane\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ Mr SOULI Hamza\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ Encadrante externe : BENABDELLAH Khaoula
+}
+\soutenance{Juin 2026}
+\jury{
+    \hspace{0.5cm}$\blacktriangleright$ Mme. xxxxx (EHTP) \dotfill Présidente\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ M. xxxxx (EHTP) \dotfill Rapporteur\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ M. xxxxx (CID Développement) \dotfill Examinateur
+}
+\academicyear{\textbf{2025 - 2026}}
+
+% \usepackage[utf8]{inputenc}
+% \usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+
+% --- Bibliographie ---
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{references.bib}
+\usepackage{needspace}
+\usepackage{csquotes}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage[most]{tcolorbox}
+\usepackage{colortbl}
+\usepackage{float}
+\usepackage{chngcntr}
+\usepackage{ltablex}
+\usepackage{textcomp}
+\usepackage{newunicodechar}
+\usepackage{listings}
+\usepackage{fontawesome5}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{tocloft}
+\usepackage{calligra} % Police calligraphique pour les signatures
+
+% =======================================================
+% CONFIGURATION TABLE DES MATIERES (Style PFE)
+% =======================================================
+% Numérotation : 1- pour section et 1 - 1 - pour subsection
+\renewcommand{\thesection}{\arabic{section}-}
+\renewcommand{\thesubsection}{\arabic{section} - \arabic{subsection} -}
+\renewcommand{\thesubsubsection}{\arabic{section} - \arabic{subsection} - \arabic{subsubsection} -}
+
+% Préfixe Chapitre dans la TOC
+\renewcommand{\cftchappresnum}{Chapitre }
+\renewcommand{\cftchapaftersnum}{ :}
+\setlength{\cftchapnumwidth}{2.4cm} % Largeur pour le texte "Chapitre X :"
+
+% Pointillés (lignes guide) pour toutes les entrées, y compris les chapitres
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+
+% Espacement vertical entre chapitres dans la TOC (réduit pour ressembler à la référence)
+\setlength{\cftbeforechapskip}{0.3em}
+
+% Retraits (indentation)
+\setlength{\cftchapindent}{0pt}
+\setlength{\cftsecindent}{1.5cm}
+\setlength{\cftsecnumwidth}{1.2cm}
+\setlength{\cftsubsecindent}{2.5cm}
+\setlength{\cftsubsecnumwidth}{2.0cm}
+
+% Police normale dans toute la TOC (pas de gras pour les chapitres, comme la référence)
+\renewcommand{\cftchapfont}{\normalfont}
+\renewcommand{\cftchappagefont}{\normalfont}
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+\renewcommand{\cftsubsecfont}{\normalfont}
+\renewcommand{\cftsubsecpagefont}{\normalfont}
+% Format Listes des figures et tableaux
+\renewcommand{\cftfigpresnum}{Figure }
+\renewcommand{\cftfigaftersnum}{ :}
+\setlength{\cftfignumwidth}{2.8cm}
+\renewcommand{\cftfigfont}{\normalfont}
+\renewcommand{\cftfigpagefont}{\normalfont}
+
+\renewcommand{\cfttabpresnum}{Tableau }
+\renewcommand{\cfttabaftersnum}{ :}
+\setlength{\cfttabnumwidth}{3.0cm}
+\renewcommand{\cfttabfont}{\normalfont}
+\renewcommand{\cfttabpagefont}{\normalfont}
+
+% =======================================================
+
+% Configuration des couleurs (Style VS Code Dark)
+\definecolor{vscodedarkbg}{RGB}{30, 30, 30}
+\definecolor{vscodekeyword}{RGB}{86, 156, 214}
+\definecolor{vscodestring}{RGB}{206, 145, 120}
+\definecolor{vscodecomment}{RGB}{106, 153, 85}
+\definecolor{vscodeannot}{RGB}{78, 201, 176}
+\definecolor{vscodetext}{RGB}{212, 212, 212}
+
+\lstdefinestyle{vscode}{
+    backgroundcolor=\color{vscodedarkbg},
+    commentstyle=\color{vscodecomment}\itshape,
+    keywordstyle=\color{vscodekeyword}\bfseries,
+    stringstyle=\color{vscodestring},
+    basicstyle=\ttfamily\footnotesize\color{vscodetext},
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=none,
+    numberstyle=\tiny\color{gray},
+    numbersep=10pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    frame=single,
+    rulecolor=\color{vscodedarkbg},
+    framesep=1ex,
+    xleftmargin=2ex,
+    classoffset=1,
+    otherkeywords={@Entity,@Id,@GeneratedValue,@Column,@Inheritance,@NotBlank},
+    morekeywords={@Entity,@Id,@GeneratedValue,@Column,@Inheritance,@NotBlank},
+    keywordstyle=\color{vscodeannot},
+    classoffset=0
+}
+\lstset{style=vscode}
+
+% Normalisation
+\newunicodechar{—}{---}
+\newunicodechar{–}{--}
+\newunicodechar{€}{\texteuro}
+\newunicodechar{œ}{\oe}
+\newunicodechar{Œ}{\OE}
+\emergencystretch=2em
+
+% Marges et headers (réglages de base)
+\geometry{left=2cm, right=2cm, top=2.5cm, bottom=2.5cm}
+\counterwithin{figure}{chapter}
+\renewcommand{\thefigure}{\thechapter-\arabic{figure}}
+% Numérotation des tableaux au format "Tableau X-Y"
+\counterwithin{table}{chapter}
+\renewcommand{\thetable}{\thechapter-\arabic{table}}
+
+% --- Personnalisation de la numérotation des sections (style CID) ---
+\renewcommand{\thesection}{\arabic{section} -}
+\renewcommand{\thesubsection}{\arabic{section} - \arabic{subsection} -}
+\renewcommand{\thesubsubsection}{\arabic{section} - \arabic{subsection} - \arabic{subsubsection} -}
+
+% --- Personnalisation du style des Chapitres ---
+\definecolor{chaporange}{RGB}{227,108,10}
+\titleformat{\chapter}[block]
+  {\normalfont\Large\bfseries\color{chaporange}\centering}
+  {\MakeUppercase{\chaptertitlename}~\thechapter~:}
+  {1em}
+  {\MakeUppercase}
+
+\titleformat{name=\chapter,numberless}[block]
+  {\normalfont\Large\bfseries\color{black}\centering}
+  {}
+  {0pt}
+  {\MakeUppercase}
+
+% --- Tous les overrides de style appliqués après que babel et la classe ont fini ---
+\AtBeginDocument{%
+  % En-têtes avec logos
+  \setlength{\headheight}{43pt}
+  \pagestyle{fancy}
+  \fancyhf{}
+  \fancyhead[L]{\includegraphics[height=1.0cm]{logos/cid-logo.jpg}}
+  \fancyhead[R]{\includegraphics[height=1.0cm]{logos/ehtp-logo.png}}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0.5pt}
+  \fancypagestyle{plain}{%
+    \fancyhf{}
+    \fancyhead[L]{\includegraphics[height=1.0cm]{logos/cid-logo.jpg}}
+    \fancyhead[R]{\includegraphics[height=1.0cm]{logos/ehtp-logo.png}}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0.5pt}%
+  }
+  % Couleurs et style des sections
+  \titleformat{\section}{\normalfont\Large\bfseries\color{black}}{\thesection}{1em}{}
+  \titleformat{\subsection}[block]{\normalfont\large\bfseries\color{black}\centering}{\thesubsection}{0.8em}{}
+  \definecolor{subsubsecblue}{RGB}{31,73,125}
+  \titleformat{\subsubsection}{\normalfont\normalsize\itshape\color{subsubsecblue}}{\thesubsubsection}{0.5em}{}
+  % Puces de listes (après babel/frenchb)
+  \renewcommand{\labelitemi}{$\bullet$}
+  \renewcommand{\labelitemii}{$\circ$}
+}
+\begin{document}
+
+\hypersetup{pageanchor=false}
+\maketitle
+\thispagestyle{empty}
+\hypersetup{pageanchor=true}
+
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+\pagenumbering{Roman}
+\setcounter{page}{1}
+
+% --- Pages préliminaires ---
+\input{chapters/0_dedicace}
+\input{chapters/0_remerciements}
+\input{chapters/0_resume}
+
+% --- Table des mati\`eres ---
+\tableofcontents
+
+\newpage
+% ---- Liste des figures (style conforme au modèle de référence) ----
+\renewcommand{\listfigurename}{\textbf{Liste des figures}}
+\addcontentsline{toc}{chapter}{Liste des figures}
+\listoffigures
+\newpage
+
+% ---- Liste des tableaux ----
+\renewcommand{\listtablename}{\textbf{Liste des tableaux}}
+\addcontentsline{toc}{chapter}{Liste des tableaux}
+\listoftables
+\newpage
+
+% ---- Liste des acronymes ----
+\input{chapters/0_acronymes}
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/0_intro_generale}
+
+% --- PREMIÈRE PARTIE : ÉTUDE BIBLIOGRAPHIQUE ---
+\part{PREMIÈRE PARTIE : ÉTUDE BIBLIOGRAPHIQUE}
+
+\input{chapters/1_fondements_cfd}
+\input{chapters/2_turbulence}
+\input{chapters/3_approximations_numeriques}
+\input{chapters/4_barrage_ahl_souss}
+
+% --- DEUXIÈME PARTIE : REVUE DES LOGICIELS CFD ---
+\part{DEUXIÈME PARTIE : REVUE DES LOGICIELS CFD}
+
+\input{chapters/5_benchmark_logiciels}
+
+% --- TROISIÈME PARTIE : DESCRIPTION D'OPENFOAM ---
+\part{TROISIÈME PARTIE : DESCRIPTION D'OPENFOAM, STRUCTURES, ALGORITHMES ET OUTILS}
+
+\input{chapters/6_structure_code_cfd}
+\input{chapters/7_structure_openfoam}
+
+% --- BIBLIOGRAPHIE ---
+\clearpage
+\phantomsection
+\addcontentsline{toc}{part}{BIBLIOGRAPHIE}
+\printbibliography[heading=none]
+
+\end{document}

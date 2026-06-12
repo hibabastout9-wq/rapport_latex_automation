@@ -1,0 +1,1725 @@
+% !TeX program = pdflatex
+% !TeX encoding = UTF-8
+
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{geometry}
+
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{tocloft}
+\usepackage{xcolor} % Ajouté pour les couleurs
+\onehalfspacing
+
+% Définition de la couleur bleu foncé
+\definecolor{bleufonce}{RGB}{0, 102, 204}
+
+% Configuration de la table des matières
+\renewcommand{\contentsname}{TABLE DES MATIÈRES}
+\renewcommand{\cftchapfont}{\bfseries\large}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforechapskip}{0.8ex}
+\setlength{\cftbeforesecskip}{0.5ex}
+\setlength{\cftbeforesubsecskip}{0.3ex}
+\setlength{\cftchapindent}{0cm}
+\setlength{\cftsecindent}{0.5cm}
+\setlength{\cftsubsecindent}{1cm}
+
+% Numérotation des équations par chapitre
+\numberwithin{equation}{chapter}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdftitle={PFE - Simulation hydraulique avec OpenFOAM - Barrage Ahl Souss},
+    pdfauthor={Hiba BASTOUT, Asmae BOULEMKHARJ}
+}
+
+\begin{document}
+
+% ===================================================
+% PAGE DE GARDE
+% ===================================================
+\begin{titlepage}
+    % En-tête avec les logos
+    % Logos
+\begin{minipage}{0.4\textwidth}
+\includegraphics[width=4cm]{logo_ehtp.jpg}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\raggedleft
+\includegraphics[width=4cm]{logo_cid.jpg}
+\end{minipage}
+
+\vspace{2cm}
+
+    \centering
+    {\Large \textbf{Ecole Hassania des Travaux Publics}}\\[0.3cm]
+    {\large Département Génie de l'Eau et de l'Environnement}\\[2.5cm]
+    
+    {\huge \textbf{PROJET DE FIN D'ÉTUDES}}\\[1.5cm]
+    
+    {\LARGE \textbf{Simulation hydraulique avec OpenFOAM}}\\[0.3cm]
+    {\LARGE \textbf{Barrage AHL SOUSS}}\\[3cm]
+    
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        {\color{bleufonce}\textbf{Réalisé par :}}\\[0.3cm]
+        Hiba BASTOUT\\
+        Asmae BOULEMKHARI
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        {\color{bleufonce}\textbf{Encadré par :}}\\[0.3cm]
+        Encadrant interne : Mme AHATTAB Jihane\\
+        Mr SOULI Hamza\\
+        
+        Encadrant externe : BENABDELLAH Khaoula
+    \end{minipage}\\[3cm]
+    
+    {\large \textbf{Année universitaire : 2025 – 2026}}
+    
+    \vfill
+\end{titlepage}
+
+% ===================================================
+% TABLE DES MATIÈRES
+% ===================================================
+\newpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\begin{center}
+    \textbf{\huge TABLE DES MATIÈRES}
+\end{center}
+\vspace{1cm}
+
+\tableofcontents
+\newpage
+
+% ===================================================
+% LISTE DES FIGURES
+% ===================================================
+\addcontentsline{toc}{chapter}{LISTE DES FIGURES}
+\begin{center}
+    \textbf{\huge LISTE DES FIGURES}
+\end{center}
+\vspace{1cm}
+
+\listoffigures
+\newpage
+
+% ===================================================
+% LISTE DES TABLEAUX
+% ===================================================
+\addcontentsline{toc}{chapter}{LISTE DES TABLEAUX}
+\begin{center}
+    \textbf{\huge LISTE DES TABLEAUX}
+\end{center}
+\vspace{1cm}
+
+\listoftables
+\newpage
+
+% ===================================================
+% INTRODUCTION GÉNÉRALE
+% ===================================================
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\chapter*{INTRODUCTION GÉNÉRALE}
+\addcontentsline{toc}{chapter}{INTRODUCTION GÉNÉRALE}
+\markboth{INTRODUCTION GÉNÉRALE}{}
+
+\subsection*{Contexte et enjeux}
+La gestion des ressources en eau constitue l'un des défis majeurs du XXIe siècle, particulièrement dans les régions arides et semi-arides comme le Maroc. Face à la raréfaction des ressources hydriques et à l'augmentation des besoins liés à la croissance démographique et au développement agricole, la mobilisation et l'optimisation des ouvrages hydrauliques existants deviennent une priorité stratégique. Dans ce contexte, les barrages jouent un rôle fondamental pour la sécurisation de l'approvisionnement en eau potable, l'irrigation des terres agricoles et la production d'énergie hydroélectrique.
+
+Le barrage Ahl Souss, également dénommé barrage Ait M'zal, constitue un ouvrage stratégique pour la région de Chtouka Ait Baha. Construit en 2005, cet ouvrage en béton compacté au rouleau (BCR) remplit des fonctions essentielles : alimentation en eau potable des populations, irrigation des périmètres agricoles et recharge de la nappe phréatique. Ses organes de sécurité, notamment l'évacuateur de crues et la vidange de fond, doivent garantir un fonctionnement fiable même lors des événements hydrologiques extrêmes.
+
+\subsection*{Problématique et objectifs}
+La conception et la vérification du comportement hydraulique des ouvrages complexes comme l'évacuateur de crues à seuil latéral et la vidange de fond du barrage Ahl Souss nécessitent une analyse approfondie des écoulements. Les approches théoriques classiques, basées sur des formules empiriques et des hypothèses simplificatrices, montrent leurs limites face à la complexité géométrique et aux phénomènes physiques mis en jeu, notamment la turbulence, les écoulements tridimensionnels et les interactions fluide-structure.
+
+La modélisation physique sur modèles réduits, bien que représentative de la réalité, présente des inconvénients majeurs : coûts élevés, délais de réalisation importants et effets d'échelle difficiles à maîtriser. Face à ces limitations, la mécanique des fluides numérique (CFD) s'impose comme une alternative complémentaire puissante, permettant une analyse détaillée des écoulements à moindre coût et dans des délais réduits.
+
+Ce projet de fin d'études s'inscrit dans cette démarche et vise à :
+\begin{itemize}
+    
+    \item \textbf{Modéliser numériquement} l'écoulement dans l'évacuateur de crues du barrage Ahl Souss.
+    \item \textbf{Simuler le comportement hydraulique} de la vidange de fond.
+    \item \textbf{Comparer les résultats numériques} avec les données théoriques et dimensionnelles.
+    \item \textbf{Proposer des recommandations} pour l'optimisation des ouvrages étudiés.
+\end{itemize}
+
+\subsection*{Méthodologie adoptée}
+Pour atteindre ces objectifs, une approche méthodologique structurée a été adoptée :
+\begin{enumerate}
+    \item \textbf{Phase bibliographique} : analyse des fondements théoriques de la CFD, étude des modèles de turbulence, revue des méthodes de discrétisation et présentation détaillée du barrage Ahl Souss.
+    \item \textbf{Phase d'analyse des outils} : benchmark des logiciels de simulation 3D et description approfondie d'OpenFOAM.
+    \item \textbf{Phase de modélisation} : construction des géométries sous Autodesk Revit, génération des maillages, définition des conditions aux limites et paramétrage des solveurs.
+    \item \textbf{Phase d'analyse des résultats} : interprétation des champs de vitesse et de pression, comparaison avec les données théoriques et formulation de recommandations.
+\end{enumerate}
+
+
+\newpage
+
+% ---
+% PREMIÈRE PARTIE : ÉTUDE BIBLIOGRAPHIQUE
+% ---
+\part{PREMIÈRE PARTIE : ÉTUDE BIBLIOGRAPHIQUE}
+
+% ---
+% CHAPITRE 1 : Fondements de la mécanique des fluides numérique
+% ---
+\chapter{Fondements de la mécanique des fluides numérique}
+\label{chap:fondements}
+
+% SECTION 1.1 : INTRODUCTION
+\section{Introduction}
+\label{sec:introduction}
+
+La modélisation constitue une représentation simplifiée d'un système complexe, visant à reproduire ses caractéristiques principales afin d'en faciliter l'analyse et la compréhension \cite{versteeg2007introduction}. Cette approche est essentielle pour appréhender des phénomènes naturels souvent régis par des interactions non-linéaires entre de nombreux paramètres, comme en météorologie, en aérodynamique ou en dynamique des fluides \cite{heller2011scale}. Face aux contraintes associées aux expérimentations physiques – qu'elles soient coûteuses, dangereuses ou limitées par des effets d'échelle difficilement maîtrisables – les modèles mathématiques et numériques s'imposent comme des alternatives incontournables \cite{ferziger2002computational}.
+
+La Mécanique des Fluides Numérique (MFN), plus connue sous son acronyme anglais Computational Fluid Dynamics (CFD), constitue une branche spécifique de la mécanique des fluides dédiée à la simulation numérique du comportement des écoulements réels à partir des équations fondamentales, notamment les équations de Navier-Stokes \cite{roychowdhury2020computational}. Bien que ces équations soient connues depuis près de deux siècles, leur résolution analytique générale constitue encore aujourd'hui l'un des problèmes ouverts majeurs de la physique mathématique.
+
+La CFD repose sur des méthodes issues de l'analyse numérique et des mathématiques appliquées, transformant un problème continu (espace et temps infinis) en un problème discret (nombre fini de points) résolvable par ordinateur \cite{patankar1980numerical}. Cette discrétisation permet d'approcher numériquement la solution des équations aux dérivées partielles qui régissent l'écoulement, offrant ainsi une vision approfondie des phénomènes physiques tout en assurant précision, réduction des coûts et sécurité \cite{tu2018computational}.
+
+
+% SECTION 1.2 : LES ÉQUATIONS DE BASE DE LA MÉCANIQUE DES FLUIDES
+\section{Les équations de base de la mécanique des fluides}
+\label{sec:equations_base}
+
+L'analyse de tout problème en mécanique des fluides repose sur l'application des principes fondamentaux de conservation. La modélisation numérique des écoulements s'appuie sur la résolution d'équations de bilan traduisant trois principes essentiels : la conservation de la masse, la conservation de la quantité de mouvement et la conservation de l'énergie \cite{schlichting2016boundary}.
+
+L'établissement de ces équations repose sur la définition d'un volume de contrôle, qui peut être fixe ou en mouvement selon l'approche adoptée. Deux descriptions sont couramment utilisées :
+\begin{itemize}
+    \item \textbf{L'approche lagrangienne} : le mouvement du fluide est décrit en suivant la trajectoire de particules fluides spécifiques.
+    \item \textbf{L'approche eulérienne} : l'écoulement est analysé en observant les variations des grandeurs caractéristiques en des points fixes de l'espace \cite{anderson1995computational}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure1_2.png}
+        \subcaption{Description lagrangienne}
+        \label{fig:lagrangienne}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure1_3.png}
+        \subcaption{Description eulérienne}
+        \label{fig:eulerienne}
+    \end{minipage}
+    \caption{Représentations des approches lagrangienne et eulérienne en mécanique des fluides.}
+    \label{fig:approches_lagrangienne_eulerienne}
+\end{figure}
+
+\subsection{L'équation de continuité}
+\label{subsec:continuite}
+
+L'équation de continuité traduit le principe de conservation de la masse, stipulant que le taux de changement de la masse du système dans le temps est nul \cite{batchelor1967introduction}. Pour un volume de contrôle fixe, la forme intégrale s'écrit :
+
+\begin{equation}
+\frac{\partial}{\partial t} \int_{V_c} \rho \, d\Omega + \int_{S_c} \rho \, \vec{V} \cdot \vec{n} \, dS = 0
+\label{eq:continuite_integrale}
+\end{equation}
+\begin{itemize}
+    \item[--] \(t\) : le temps 
+    \item[--] \(V_c\) : le volume de contrôle
+    \item[--] \(\rho\) : la masse volumique du fluide \([kg/m^3]\)
+    \item[--] \(\Omega\) : le domaine du volume de contrôle
+    \item[--] \(S_c\) : la surface de contrôle (frontière du volume de contrôle)
+    \item[--] \(\vec{V}\) : le vecteur vitesse du fluide \([m/s]\)
+    \item[--] \(\vec{n}\) : le vecteur unitaire normal à la surface \(S_c\), orienté vers l'extérieur
+\end{itemize}
+
+Cette équation indique que la somme de la variation temporelle de la masse contenue dans le volume de contrôle et du flux massique à travers sa surface est nulle. Par application de la formule de divergence, on obtient la forme locale de l'équation de continuité \cite{panton2013incompressible} :
+
+\begin{equation}
+\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \vec{V}) = 0
+\label{eq:continuite_locale}
+\end{equation}
+
+Pour un fluide incompressible, hypothèse valable pour l'eau dans la plupart des applications hydrauliques, la masse volumique reste constante, ce qui simplifie l'équation à :
+
+\begin{equation}
+\nabla \cdot \vec{V} = 0
+\label{eq:continuite_incompressible}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure1_4.png}
+    \caption{Volume de contrôle fixe traversé par le fluide en mouvement.}
+    \label{fig:volume_controle_fixe}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure1_5.png}
+    \caption{Volume élémentaire fixe pour l'établissement de la forme locale.}
+    \label{fig:volume_elementaire}
+\end{figure}
+
+\subsection{L'équation de conservation de la quantité de mouvement}
+\label{subsec:quantite_mouvement}
+
+La conservation de la quantité de mouvement découle de l'application de la seconde loi de Newton à un élément fluide. Elle stipule que le taux de variation de la quantité de mouvement est égal à la somme des forces extérieures (forces de volume et forces de surface) \cite{currie2012fundamental}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure1_6.png}
+    \caption{Volume de contrôle en mouvement sur lequel s'appliquent des efforts.}
+    \label{fig:volume_controle_mouvement}
+\end{figure}
+
+Pour un fluide newtonien incompressible, les équations de Navier-Stokes s'écrivent sous forme vectorielle :
+
+\begin{equation}
+\rho \left( \frac{\partial \vec{V}}{\partial t} + (\vec{V} \cdot \nabla)\vec{V} \right) = -\nabla p + \mu \nabla^2 \vec{V} + \rho \vec{f}
+\label{eq:navier_stokes}
+\end{equation}
+
+Cette équation comporte deux termes fondamentaux :
+\begin{itemize}
+    \item Le \textbf{terme de convection} \( (\vec{V} \cdot \nabla)\vec{V} \), source de non-linéarité et de complexité.
+    \item Le \textbf{terme de diffusion} \( \mu \nabla^2 \vec{V} \), représentant les interactions moléculaires dissipatives \cite{white2015fluid}.
+\end{itemize}
+
+Les équations \eqref{eq:continuite_incompressible} et \eqref{eq:navier_stokes} forment un système de quatre équations aux dérivées partielles pour quatre inconnues (pression p et les trois composantes de vitesse). Bien que mathématiquement bien posé, ce système ne possède pas de solution analytique générale en raison de sa non-linéarité \cite{kundu2015fluid}.
+
+% SECTION 1.3 : AVANTAGES DE LA CFD PAR RAPPORT AUX ÉTUDES EXPÉRIMENTALES
+\section{Avantages de la CFD par rapport aux études expérimentales}
+\label{sec:avantages_cfd}
+
+Les récents progrès de la CFD en font un outil intéressant surtout en termes de coûts et de temps par rapport aux études expérimentales, dans un grand nombre de domaines de l'ingénierie, que ce soit dans l'industrie ou au niveau académique \cite{wendt2009computational}. Les différents avantages de la CFD par rapport aux essais expérimentaux en laboratoire sont résumés dans le tableau ci-dessous \cite{roychowdhury2020computational} :
+
+\begin{table}[H]
+    \centering
+    \caption{Comparaison entre la CFD et les études expérimentales}
+    \label{tab:comparaison_cfd_exp}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Critère} & \textbf{CFD} & \textbf{Études Expérimentales} \\
+        \hline
+        Coûts & Relativement bon marché & Cher \\
+        \hline
+        Temps & Court & Long \\
+        \hline
+        Échelles & Toutes (modèle réel possible) & Petites/Moyennes (modèles réduits) \\
+        \hline
+        Informations & Accès à toutes les variables en tout point & Limitée aux points de mesure \\
+        \hline
+        Répétabilité & Sans limite et parfaitement contrôlable & Difficile à cause des incertitudes \\
+        \hline
+        Sécurité & Très sécuritaire & Peut-être dangereux \\
+        \hline
+        Analyse de scénarios & Très simple et rapide & Lourd et coûteux \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% SECTION 1.4 : CONCLUSION
+\section{Conclusion}
+\label{sec:conclusion_chap1}
+
+Ce premier chapitre a établi les fondements théoriques de la mécanique des fluides numérique, en présentant les équations de conservation qui constituent le socle de toute simulation CFD. La compréhension de ces équations est essentielle pour appréhender les défis liés à la modélisation des écoulements, notamment le caractère non-linéaire des équations de Navier-Stokes qui rend leur résolution analytique impossible dans le cas général. Cette situation justifie pleinement le recours aux méthodes numériques développées dans les chapitres suivants.
+
+% ---
+% CHAPITRE 2 : La turbulence en mécanique des fluides numérique
+% ---
+\chapter{La turbulence en mécanique des fluides numérique}
+\label{chap:turbulence}
+
+% SECTION 2.1 : INTRODUCTION
+\section{Introduction}
+\label{sec:introduction_turbulence}
+
+La turbulence désigne l'état de l'écoulement d'un fluide, liquide ou gaz, dont la vitesse possède un caractère tourbillonnaire et une orientation variable constamment dans l'espace, ce qui ne permet pas de prévoir son comportement de manière déterministe \cite{tennekes1972first}. Les écoulements turbulents se caractérisent par :
+\begin{itemize}
+    \item Le désordre et l'irrégularité de l'écoulement.
+    \item Un caractère tridimensionnel et non-linéaire.
+    \item La présence de tourbillons de différentes échelles avec un transfert d'énergie des plus grands vers les plus petits \cite{pope2000turbulent}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figure2_1.png}
+    \caption{Écoulement laminaire.}
+    \label{fig:laminaire}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figure2_2.png}
+    \caption{Écoulement turbulent.}
+    \label{fig:turbulent}
+\end{figure}
+
+L'origine du désordre caractérisant l'écoulement repose sur le terme non-linéaire de l'équation de Navier-Stokes qui est le terme inertiel de transport par convection. Ainsi, plus le nombre de Reynolds est grand, plus ce terme aura du poids dans la dynamique et plus l'écoulement sera complexe et turbulent \cite{davidson2015turbulence}. Le nombre de Reynolds est donné comme suit \cite{reynolds1883experimental} :
+
+\begin{equation}
+Re = \frac{V \times L}{\nu}
+\label{eq:reynolds}
+\end{equation}
+
+Le tableau ci-dessous illustre, à titre d'exemple, quelques valeurs critiques de Re pour différentes géométries :
+
+\begin{table}[H]
+    \centering
+    \caption{Exemples de valeurs critiques du nombre de Reynolds}
+    \label{tab:reynolds_critique}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Géométrie} & \textbf{Longueur caractéristique L} & \textbf{Re critique} \\
+        \hline
+        Écoulement en conduite & Diamètre (D) & ≈ 2300 \\
+        \hline
+        Plaque plane (couche limite) & Longueur de la plaque (x) & ≈ 5×10⁵ \\
+        \hline
+        Écoulement autour d'une sphère & Diamètre (D) & ≈ 3×10⁵ \\
+        \hline
+        Entre deux plaques parallèles & Distance entre plaques (h) & ≈ 1000 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% SECTION 2.2 : LES APPROCHES DE MODÉLISATION DE LA TURBULENCE
+\section{Les approches de modélisation de la turbulence}
+\label{sec:approches_turbulence}
+
+La modélisation de la turbulence est une branche de la mécanique des fluides utilisée pour prédire le comportement d'un écoulement dans lequel tout ou partie du fluide est turbulent. Malgré des efforts importants de recherche depuis plus d'un siècle, la modélisation des écoulements turbulents demeure un défi à relever \cite{wilcox2006turbulence}. Il existe principalement trois axes de recherche \cite{sagaut2006large} :
+
+\subsection{Simulation numérique directe (DNS)}
+\label{subsec:dns}
+
+Cette méthode permet de résoudre directement les équations de Navier-Stokes sans aucune modélisation. Elle présente ainsi l'avantage de donner accès à toutes les quantités instantanées considérées dans l'écoulement. Tous les mouvements doivent être résolus par cette méthode, depuis les plus petites échelles dissipatives jusqu'à l'échelle intégrale. Le nombre de mailles est alors important, ce qui a pour conséquences des temps de calcul extrêmement longs \cite{moin1998direct}. La capacité et la performance des calculateurs actuels ne cessent de progresser mais ne permettent pas encore de sonder des écoulements complexes dans un contexte industriel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure2_3.png}
+    \caption{DNS d'un jet d'air issu d'une tuyère.}
+    \label{fig:dns_jet}
+\end{figure}
+
+\subsection{Simulation des grandes échelles (LES)}
+\label{subsec:les}
+
+Il s'agit d'une méthode numérique intermédiaire entre la DNS et les méthodes statistiques consistant à appliquer un filtre spatial en tout point du domaine \cite{lesieur2005large}. Le champ filtré est obtenu par un produit de convolution dans l'espace :
+
+\begin{equation}
+\bar{\Phi}(x) = \int_D \Phi(x') G(x, x') dx'
+\label{eq:filtre_les}
+\end{equation}
+
+Le filtre sépare les grandes échelles (simulées) des petites structures (modélisées). On suppose ici que le comportement de ces dernières ne dépend pas de la géométrie et est universel. La LES est moins coûteuse que la DNS, mais reste très exigeante en ressources de calcul, ce qui limite encore son application industrielle courante \cite{piomelli1999large}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure2_4.png}
+    \caption{LES de la collision axiale de deux anneaux tourbillonnaires.}
+    \label{fig:les_anneaux}
+\end{figure}
+
+\subsection{Modélisation statistique (RANS)}
+\label{subsec:rans}
+
+Cette approche consiste à mettre de côté le mouvement instantané du fluide, afin d'exprimer les équations du champ moyen en se servant de la décomposition de Reynolds des variables en une partie moyenne et une partie fluctuante \cite{reynolds1895dynamical} :
+
+\begin{equation}
+\phi(x_i, t) = \overline{\phi}(x_i) + \phi'(x_i, t)
+\label{eq:decomposition_reynolds}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure2_5.png}
+    \caption{Décomposition des variables selon l'approche RANS.}
+    \label{fig:decomposition_reynolds}
+\end{figure}
+
+En introduisant cette décomposition dans les équations de Navier-Stokes et en prenant la moyenne, on obtient les équations RANS (Reynolds-Averaged Navier-Stokes). Ce processus fait apparaître de nouvelles inconnues : les \textbf{tensions de Reynolds} (\( -\rho \overline{u_i' u_j'} \)), qui représentent l'influence des fluctuations turbulentes sur l'écoulement moyen \cite{hinze1975turbulence}.
+
+\subsection{Remarques sur les trois approches}
+\label{subsec:remarques_approches}
+
+Pour une modélisation précise, il faut prévoir des maillages très fins, ce qui nécessite des coûts et des temps très importants. C'est pour cela qu'on préfère l'approche statistique car elle est plus rapide et moins coûteuse \cite{rodi1993turbulence}. Le tableau suivant compare les différentes approches de modélisation \cite{durbin2010statistical} :
+
+\begin{table}[H]
+    \centering
+    \caption{Comparaison des approches de modélisation de la turbulence}
+    \label{tab:comparaison_approches}
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{Approche} & \textbf{Résolution des tourbillons} & \textbf{Coût de calcul} & \textbf{Précision} & \textbf{Applications} \\
+        \hline
+        RANS & Tous modélisés & Faible & Moyenne & Industrielles courantes \\
+        \hline
+        LES & Grands résolus, petits modélisés & Élevé & Bonne & Recherche, écoulements complexes \\
+        \hline
+        DNS & Tous résolus & Extrêmement élevé & Excellente & Recherche fondamentale \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% SECTION 2.3 : CLASSIFICATION DES MODÈLES DE TURBULENCE
+\section{Classification des modèles de turbulence}
+\label{sec:classification_modeles}
+
+Le système formé par les équations RANS n'est pas fermé, car on dispose de quatre équations mais dix inconnues, ce sont les tensions de Reynolds qui posent le problème. L'enjeu est de trouver une relation liant les tensions de Reynolds au champ de vitesse moyen \cite{launder1972lectures}.
+
+\subsection{Modèle à viscosité turbulente}
+\label{subsec:viscosite_turbulente}
+
+Boussinesq \cite{boussinesq1877essai} fut le premier à introduire la notion de viscosité turbulente en proposant une relation en analogie avec celle de Newton pour les contraintes de viscosité moléculaire. Schématiquement cela revient à poser une relation linéaire entre les contraintes turbulentes (contraintes de Reynolds) et le gradient de vitesse moyen \cite{schmitt2007boussinesq} :
+
+\begin{equation}
+-\rho \overline{u_i' u_j'} = \mu_t \left( \frac{\partial \overline{u_i}}{\partial x_j} + \frac{\partial \overline{u_j}}{\partial x_i} \right) - \frac{2}{3} \rho k \delta_{ij}
+\label{eq:boussinesq}
+\end{equation}
+
+Avec \( \mu_t \) la viscosité dynamique turbulente et \( k \) l'énergie cinétique de turbulence.
+
+\subsection{Le modèle de longueur de mélange - modèle de Prandtl}
+\label{subsec:longueur_melange}
+
+Une étude dimensionnelle montre que la viscosité turbulente est proportionnelle à une échelle de longueur l et une échelle de vitesse u représentatives de l'agitation turbulente \cite{prandtl1925bericht}. Prandtl \cite{prandtl1945uber} a proposé le modèle de longueur de mélange dans lequel la viscosité cinématique turbulente \( \nu_t \) est directement reliée au gradient de vitesse moyenne par l'intermédiaire d'une longueur \( l_m \) appelée longueur de mélange :
+
+\begin{equation}
+\nu_t = l_m^2 \left| \frac{\partial \bar{u}}{\partial y} \right|
+\label{eq:longueur_melange}
+\end{equation}
+
+Avec \( l_m = \kappa y \) et \( \kappa = 0,41 \) la constante de Von Karman.
+
+% SECTION 2.4 : MODÈLES DE FERMETURE DES APPROCHES STATISTIQUES À DEUX ÉQUATIONS DE TRANSPORT
+\section{Modèles de fermeture des approches statistiques à deux équations de transport}
+\label{sec:modeles_deux_equations}
+
+Plusieurs modèles à deux équations ont été développés pour représenter les deux échelles indépendamment. Ils sont largement utilisés dans l'industrie \cite{hanjalic2011modelling}.
+
+\subsection{Modèle de fermeture \( k-\varepsilon \)}
+\label{subsec:modele_k_epsilon}
+
+Ce modèle a été établi par Jones et Launder \cite{jones1972prediction}. Il relie les grandeurs caractéristiques de la turbulence : énergie cinétique turbulente k, taux de dissipation ε et viscosité turbulente \( \mu_t \). Les équations de transport de k et ε sont \cite{launder1974application} :
+
+\begin{align}
+\frac{\partial}{\partial t} (\rho k) + \frac{\partial}{\partial x_j} (\rho u_j k) &= \frac{\partial}{\partial x_j} \left[ \left( \mu + \frac{\mu_t}{\sigma_k} \right) \frac{\partial k}{\partial x_j} \right] + P_k - \rho \varepsilon \label{eq:transport_k} \\
+\frac{\partial}{\partial t} (\rho \varepsilon) + \frac{\partial}{\partial x_j} (\rho u_j \varepsilon) &= \frac{\partial}{\partial x_j} \left[ \left( \mu + \frac{\mu_t}{\sigma_\varepsilon} \right) \frac{\partial \varepsilon}{\partial x_j} \right] + C_{\varepsilon 1} \frac{\varepsilon}{k} P_k - C_{\varepsilon 2} \frac{\rho \varepsilon^2}{k} \label{eq:transport_epsilon}
+\end{align}
+
+La viscosité turbulente est donnée par \( \mu_t = \rho C_\mu \frac{k^2}{\varepsilon} \). Les constantes du modèle standard sont : \( C_\mu = 0,09 \), \( C_{\varepsilon 1} = 1,44 \), \( C_{\varepsilon 2} = 1,92 \), \( \sigma_k = 1,0 \), \( \sigma_\varepsilon = 1,3 \) \cite{launder1974numerical}.
+
+\subsection{Modèle de fermeture \( k-\omega \)}
+\label{subsec:modele_k_omega}
+
+Le modèle \( k-\omega \) de Wilcox \cite{wilcox1988reassessment} utilise le paramètre \( \omega \), le taux de dissipation spécifique défini par \( \omega = \varepsilon/k \). La viscosité turbulente devient \( \mu_t = \rho \frac{k}{\omega} \). Les équations de transport sont \cite{wilcox2008formulation} :
+
+\begin{align}
+\frac{\partial}{\partial t} (\rho k) + \frac{\partial}{\partial x_j} (\rho u_j k) &= \frac{\partial}{\partial x_j} \left[ \left( \mu + \frac{\mu_t}{\sigma_k} \right) \frac{\partial k}{\partial x_j} \right] + P_k - \beta^* \rho k \omega \label{eq:transport_k_omega} \\
+\frac{\partial}{\partial t} (\rho \omega) + \frac{\partial}{\partial x_j} (\rho u_j \omega) &= \frac{\partial}{\partial x_j} \left[ \left( \mu + \frac{\mu_t}{\sigma_\omega} \right) \frac{\partial \omega}{\partial x_j} \right] + \alpha \frac{\omega}{k} P_k - \beta \rho \omega^2 \label{eq:transport_omega}
+\end{align}
+
+\subsection{Modèle de fermeture \( k-\omega \) SST}
+\label{subsec:modele_k_omega_sst}
+
+Menter \cite{menter1994two} a proposé un modèle hybride combinant les avantages des modèles \( k-\omega \) près des parois et \( k-\varepsilon \) loin des parois. Le modèle \( k-\omega \) SST (Shear Stress Transport) utilise une fonction de commutation \( F_1 \) pour basculer entre les deux formulations \cite{menter2003ten} :
+
+\begin{equation}
+\mu_t = \frac{a_1 \rho k}{\max(a_1 \omega, S F_2)}
+\label{eq:mu_t_sst}
+\end{equation}
+
+Ce modèle sera privilégié pour notre étude car il offre une bonne précision dans les zones à forts gradients de vitesse, ce qui est essentiel pour modéliser correctement les écoulements dans les évacuateurs de crues et les vidanges de fond.
+
+% SECTION 2.5 : CONCLUSION
+\section{Conclusion}
+\label{sec:conclusion_chap2}
+
+En définitive, bien que la turbulence soit un phénomène omniprésent dans la nature et le quotidien, elle reste difficile à définir avec précision en raison de son caractère chaotique et imprévisible. Ce comportement tourbillonnaire, en perpétuelle variation de forme, de position et d'intensité, traduit la complexité du régime turbulent. Pour notre étude, le modèle \( k-\omega \) SST sera privilégié car il combine robustesse et précision.
+
+% ---
+% CHAPITRE 3 : Approximations numériques pour la résolution des équations aux dérivées partielles
+% ---
+\chapter{Approximations numériques pour la résolution des équations aux dérivées partielles}
+\label{chap:approximations_numeriques}
+
+% SECTION 3.1 : INTRODUCTION
+\section{Introduction}
+\label{sec:introduction_approx}
+
+Les équations de Navier-Stokes sont largement utilisées pour modéliser le comportement des fluides. Toutefois, en tant qu'équations aux dérivées partielles (EDP) non linéaires, elles ne disposent pas de solution analytique générale. Pour cette raison, la résolution numérique constitue l'approche privilégiée afin d'obtenir des solutions approchées \cite{hirsch2007numerical}.
+
+Parmi les techniques numériques les plus courantes, les méthodes des différences finies, des volumes finis et des éléments finis permettent de discrétiser le problème continu en un système algébrique traitable \cite{tannehill1997computational}.
+
+% SECTION 3.2 : MÉTHODE DES DIFFÉRENCES FINIES
+\section{Méthode des différences finies}
+\label{sec:differences_finies}
+
+La méthode des différences finies consiste à approximer les dérivées des équations physiques à l'aide des séries de Taylor, en s'appuyant directement sur la définition mathématique de la dérivée \cite{smith1985numerical}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_1.png}
+    \caption{Maillage de la méthode des différences finies.}
+    \label{fig:maillage_df}
+\end{figure}
+
+Pour une fonction u(x), la dérivée première peut être approximée par différents schémas. En utilisant le développement en série de Taylor :
+
+\begin{equation}
+u(x + \Delta x) = u(x) + \Delta x \frac{\partial u}{\partial x} + \frac{\Delta x^2}{2} \frac{\partial^2 u}{\partial x^2} + \dots
+\label{eq:taylor}
+\end{equation}
+
+On obtient :
+\begin{itemize}
+    \item \textbf{Schéma décentré avant} (ordre 1) : \( \left( \frac{\partial u}{\partial x} \right)_i \approx \frac{u_{i+1} - u_i}{\Delta x} \)
+    \item \textbf{Schéma décentré arrière} (ordre 1) : \( \left( \frac{\partial u}{\partial x} \right)_i \approx \frac{u_i - u_{i-1}}{\Delta x} \)
+    \item \textbf{Schéma centré} (ordre 2) : \( \left( \frac{\partial u}{\partial x} \right)_i \approx \frac{u_{i+1} - u_{i-1}}{2\Delta x} \)
+\end{itemize}
+
+La dérivée seconde est approximée par le schéma centré d'ordre 2 \cite{strikwerda2004finite} :
+
+\begin{equation}
+\left( \frac{\partial^2 u}{\partial x^2} \right)_i \approx \frac{u_{i+1} - 2u_i + u_{i-1}}{\Delta x^2}
+\label{eq:derivee_seconde}
+\end{equation}
+
+% SECTION 3.3 : MÉTHODE DES ÉLÉMENTS FINIS
+\section{Méthode des éléments finis}
+\label{sec:elements_finis}
+
+La méthode des éléments finis vise à minimiser l'erreur générée lors de l'approximation d'un problème continu par sa formulation discrète \cite{zienkiewicz2013finite}. Le domaine est subdivisé en petits éléments de géométrie simple interconnectés en des points appelés « nœuds ». La solution est recherchée sous forme d'une combinaison linéaire de fonctions de base locales \cite{reddy2006introduction} :
+
+\begin{equation}
+\Phi_h(x) = \sum_{i=1}^{n} \Phi_i(x) N_i
+\label{eq:elements_finis}
+\end{equation}
+
+Cette méthode est très mathématique et peut être appliquée à des géométries variées, mais elle rencontre des obstacles lorsqu'il s'agit de termes non linéaires, ce qui limite son application en CFD \cite{hughes2012finite}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figure3_2.png}
+    \caption{Les géométries de référence de quelques éléments 2D courants.}
+    \label{fig:elements_2d}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_3.png}
+    \caption{Maillage en éléments finis d'un pont de type Bow-string en vue d'une simulation.}
+    \label{fig:maillage_pont}
+\end{figure}
+
+% SECTION 3.4 : MÉTHODE DES VOLUMES FINIS
+\section{Méthode des volumes finis}
+\label{sec:volumes_finis}
+
+La méthode des volumes finis repose sur l'intégration des équations en formulation intégrale sur des volumes élémentaires \cite{leveque2002finite}. Contrairement à la méthode des éléments finis, elle est particulièrement bien adaptée à la discrétisation spatiale des lois de conservation, ce qui en fait une méthode de choix en mécanique des fluides \cite{eymard2000finite}.
+
+L'équation générale de transport pour une variable \( \phi \) s'écrit sous forme conservative \cite{moukalled2016finite} :
+
+\begin{equation}
+\frac{\partial}{\partial t}(\rho\phi) + \nabla\cdot(\rho\phi\vec{u}) = \nabla\cdot(\Gamma\nabla\phi) + S_\phi
+\label{eq:transport_general}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_4.png}
+    \caption{Comparaison des approches (a) « Cell-centred », (b) « Vertex-centred », (c) « Cell-vertex ».}
+    \label{fig:approches_vf}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_5.png}
+    \caption{Exemples des volumes de contrôle en 1D et 2D.}
+    \label{fig:volumes_controle_1d_2d}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_6.png}
+    \caption{Exemple d'un volume de contrôle en 3D.}
+    \label{fig:volume_controle_3d}
+\end{figure}
+
+\subsection{Discrétisation des termes de l'équation de transport}
+\label{subsec:discretisation_termes}
+
+\textbf{Discrétisation temporelle} : Le schéma d'Euler implicite, inconditionnellement stable mais précis au premier ordre, approxime la dérivée temporelle par \cite{butcher2016numerical} :
+
+\begin{equation}
+\int_V \frac{\partial (\rho\phi)}{\partial t} dV \approx \frac{(\rho\phi)_P^{n+1} - (\rho\phi)_P^n}{\Delta t} V_P
+\label{eq:euler_implicite}
+\end{equation}
+
+\textbf{Terme de convection} : Il représente le transport de \( \phi \) par l'écoulement \cite{wesseling2001principles} :
+
+\begin{equation}
+\int_A \vec{n}\cdot(\rho\phi\vec{u})dA \approx \sum_f F_f \phi_f
+\label{eq:convection}
+\end{equation}
+
+\textbf{Terme de diffusion} : Il représente le transport par gradient \cite{ferziger2002computational} :
+
+\begin{equation}
+\int_A \vec{n}\cdot(\Gamma\nabla\phi)dA \approx \sum_f \Gamma_f (\vec{n}\cdot\nabla\phi)_f A_f
+\label{eq:diffusion}
+\end{equation}
+
+\subsection{Les schémas de discrétisation}
+\label{subsec:schemas_discretisation}
+
+\textbf{Schéma Upwind du premier ordre} : Stable et conservatif, ce schéma prend la valeur amont sans considération aval \cite{patankar1980numerical} :
+
+\begin{equation}
+\phi_e = \phi_P \text{ si } F_e > 0, \quad \phi_e = \phi_E \text{ si } F_e < 0
+\label{eq:upwind}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_7.png}
+    \caption{Schéma Upwind du 1er ordre.}
+    \label{fig:upwind}
+\end{figure}
+
+\textbf{Schéma linéaire centré} : Plus précis (ordre 2), il utilise l'interpolation linéaire \cite{leonard1979stable} :
+
+\begin{equation}
+\phi_f = \frac{\phi_P + \phi_E}{2}
+\label{eq:centre}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_8.png}
+    \caption{Schéma linéaire centré.}
+    \label{fig:centre}
+\end{figure}
+
+\textbf{Schéma QUICK} : Proposé par Leonard \cite{leonard1991ultimate}, ce schéma d'ordre 3 utilise une interpolation quadratique pondérée :
+
+\begin{equation}
+\phi_e = \frac{6}{8}\phi_P + \frac{3}{8}\phi_E - \frac{1}{8}\phi_W \quad \text{pour } F_e > 0
+\label{eq:quick}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figure3_9.png}
+    \caption{Schéma QUICK.}
+    \label{fig:quick}
+\end{figure}
+
+% SECTION 3.5 : CONCLUSION
+\section{Conclusion}
+\label{sec:conclusion_chap3}
+
+Ce chapitre nous a familiarisés avec diverses méthodes d'approximation numérique pour résoudre les équations de Navier-Stokes utilisées dans la modélisation hydraulique. Nous avons examiné les méthodes des différences finies, des éléments finis et des volumes finis. Ces méthodes constituent la base des outils de simulation numérique en hydraulique, et il est essentiel de choisir la méthode appropriée en fonction des caractéristiques du problème à résoudre. Dans notre cas, nous utiliserons la méthode des volumes finis qui est la méthode adoptée par OpenFOAM.
+
+% ---
+% CHAPITRE 4 : Présentation du barrage Ahl Souss (Ait M'zal)
+% ---
+\chapter{Présentation du barrage Ahl Souss (Ait M'zal)}
+\label{chap:barrage}
+
+% SECTION 4.1 : INTRODUCTION
+\section{Introduction}
+\label{sec:introduction_barrage}
+
+Le barrage Ahl Souss, également dénommé barrage Ait M'zal, s'inscrit dans le cadre du programme national des barrages visant à mobiliser les ressources en eau pour le développement socio-économique des régions. Cet ouvrage, dont la construction s'est achevée en 2005, constitue un aménagement hydraulique stratégique pour la province de Chtouka Ait Baha, répondant à des objectifs multiples d'alimentation en eau potable, d'irrigation et de recharge de la nappe phréatique \cite{scet1994ahl, fiche_historique}.
+
+% SECTION 4.2 : SITUATION ET ACCÈS
+\section{Situation et accès}
+\label{sec:situation_acces}
+
+Le barrage Ait M'zal est implanté sur l'oued Izig, dans la commune rurale d'Ait M'zal, province de Chtouka Ait Baha, région administrative de Souss-Massa. Il se situe à proximité du douar Tlet Wanas, à environ 500 mètres de la route secondaire n°509, à 3,9 km du centre du village d'Ait Baha et à 65 km au sud-est d'Agadir \cite{scet1994ahl, fiche_synoptique}.
+
+L'axe du barrage est défini par les points de coordonnées Lambert suivants \cite{fiche_synoptique} :
+\begin{itemize}
+    \item \textbf{Point A (rive droite)} : X = 140 520,860 ; Y = 345 215,940
+    \item \textbf{Point B (rive gauche)} : X = 140 516,280 ; Y = 345 216,140
+\end{itemize}
+
+La cote moyenne du lit de l'oued au droit du barrage est de 572,00 NGM (Nivellement Général du Maroc). L'accès à l'ouvrage se fait par une route goudronnée de 3900 m depuis le village d'Ait Baha \cite{fiche_synoptique}.
+
+% SECTION 4.3 : BUT DE L'OUVRAGE
+\section{But de l'ouvrage}
+\label{sec:but_ouvrage}
+
+Conformément aux objectifs définis par l'Administration de l'Hydraulique, le barrage remplit trois fonctions principales \cite{scet1994ahl, fiche_synoptique} :
+\begin{itemize}
+    \item \textbf{L'irrigation} des périmètres agricoles situés en aval, contribuant à la sécurité alimentaire et au développement économique local.
+    \item \textbf{L'alimentation en eau potable} des populations de la région, répondant aux besoins croissants liés à la démographie et au développement touristique.
+    \item \textbf{La recharge de la nappe phréatique}, participant à la gestion durable des ressources en eau souterraines du bassin du Souss-Massa.
+\end{itemize}
+
+% SECTION 4.4 : CONTEXTE GÉOLOGIQUE
+\section{Contexte géologique}
+\label{sec:geologie}
+
+La zone du barrage s'inscrit dans la partie nord de l'Anti-Atlas occidental, caractérisée par les formations du Précambrien I appartenant à la boutonnière de Kerdouss \cite{note_geologique_2003}. Le substratum est constitué de roches volcaniques acides.
+
+La géologie de surface révèle des disparités entre les deux rives \cite{note_geologique_2003, fiche_synoptique} :
+\begin{itemize}
+    \item \textbf{Rive gauche} : présence de deux faciès :
+    \begin{itemize}
+        \item Une brèche volcanique blanchâtre à grisâtre à éléments grossiers, assez dure mais parfois friable, avec une résonance sourde aux coups du marteau.
+        \item La roche est affectée par plusieurs familles de fractures subverticales (directions principales N60-70 et N05-15), présentant une oxydation rouille sur les facettes dégagées.
+    \end{itemize}
+    \item \textbf{Rive droite} : rhyolite grise, dure et sonore aux coups du marteau, affleurant en gros blocs massifs et métriques. La roche présente les mêmes familles de fractures qu'en rive gauche.
+    \item \textbf{Fond de vallée} : des alluvions récentes prédominent dans le lit mineur de l'oued, avec une épaisseur estimée de 4 à 5 mètres. Le reste de la vallée est occupé par une terrasse limoneuse plus développée en rive gauche, avec des colluvions et éboulis de pentes (épaisseur 3-4 m).
+\end{itemize}
+
+Les investigations géologiques n'ont révélé aucun indice majeur d'instabilité des versants, et l'étanchéité du site est jugée satisfaisante \cite{scet1994ahl}.
+
+% SECTION 4.5 : CARACTÉRISTIQUES HYDROLOGIQUES
+\section{Caractéristiques hydrologiques}
+\label{sec:hydrologie}
+
+Le bassin versant de l'oued Izig présente les caractéristiques physiques suivantes \cite{donnees_hydrologiques, fiche_synoptique} :
+\begin{itemize}
+    \item Superficie : 187 km²
+    \item Altitude moyenne : 1287 m
+    \item Pluie moyenne annuelle : 269-275 mm
+    \item Apport moyen annuel : 5,1 millions de m³ (série de données de 1932 à 2006) \cite{bilans_apports}
+    \item Envasement moyen annuel : 100 000 m³/an
+\end{itemize}
+
+Les débits de pointe des crues pour différentes périodes de retour sont \cite{donnees_hydrologiques, fiche_synoptique} :
+
+\begin{table}[H]
+    \centering
+    \caption{Débits de crues du barrage Ahl Souss}
+    \label{tab:debits_crues}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Période de retour (ans)} & \textbf{Débit (m³/s)} & \textbf{Volume (Mm³)} \\
+        \hline
+        10 & 220 & 2,62 \\
+        \hline
+        100 & 520 & 6,27 \\
+        \hline
+        1000 & 820 & 9,85 \\
+        \hline
+        5000 & 1030 & 12,4 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+L'hydrogramme de crue, supposé triangulaire, présente un temps de base de 7 heures et un temps de montée de 2 heures \cite{donnees_hydrologiques}.
+
+% SECTION 4.6 : CARACTÉRISTIQUES DE LA RETENUE
+\section{Caractéristiques de la retenue}
+\label{sec:retenue}
+
+La retenue du barrage Ahl Souss présente les caractéristiques suivantes \cite{fiche_synoptique, bilans_apports} :
+\begin{itemize}
+    \item Niveau de retenue normale (RN) : \textbf{600,00 NGM}
+    \item Niveau des plus hautes eaux (NPHE) : \textbf{602,86 NGM}
+    \item Aire de la retenue au niveau normal : 0,5 km² (50 ha)
+    \item Capacité à retenue normale : \textbf{4,76 Mm³}
+\end{itemize}
+
+% SECTION 4.7 : CARACTÉRISTIQUES PRINCIPALES DU BARRAGE
+\section{Caractéristiques principales du barrage}
+\label{sec:caracteristiques_barrage}
+
+Le barrage Ahl Souss est un ouvrage \textbf{poids en béton compacté au rouleau (BCR)} dont les principales caractéristiques sont \cite{fiche_synoptique, fiche_historique} :
+\begin{itemize}
+    \item Hauteur maximale sur fondation : 49 m
+    \item Hauteur maximale sur terrain naturel : 32,50 m
+    \item Longueur en crête : 213,59 m
+    \item Largeur en crête : 5 m
+    \item Cote de la crête : 604,00 NGM
+    \item Fruit du parement amont : \textbf{vertical} (modifié par rapport à l'APD)
+    \item Fruit du parement aval : \textbf{0,9 H / 1 V} (modifié)
+    \item Volume total de béton : 94 000 m³ (dont 71 500 m³ de BCR et 22 500 m³ de BCV)
+\end{itemize}
+
+% SECTION 4.8 : DESCRIPTION DE L'ÉVACUATEUR DE CRUES
+\section{Description de l'évacuateur de crues}
+\label{sec:evacuateur_crues}
+
+L'évacuateur de crues est un ouvrage critique pour la sécurité du barrage, conçu pour transiter les crues exceptionnelles sans endommager l'ouvrage. Ses caractéristiques sont les suivantes \cite{fiche_synoptique, note_calcul_evacuateur} :
+
+\begin{itemize}
+    \item \textbf{Type} : Seuil libre en béton de type Creager, implanté dans la partie centrale du barrage.
+    \item \textbf{Longueur de déversement} : 75 m.
+    \item \textbf{Cote du seuil} : 600,00 NGM (calée au niveau de la retenue normale).
+    \item \textbf{Charge maximale sous NPHE} : 2,86 m (calculée après laminage de la crue millénale).
+    \item \textbf{Débit évacué sous NPHE} : 730 m³/s.
+    \item \textbf{Débit évacué sous NPHEE} : 1008 m³/s.
+    \item \textbf{Mode de restitution} : Saut de ski.
+\end{itemize}
+
+Le profil du seuil, dimensionné pour une charge de 3,20 m, est défini par l'équation \cite{note_calcul_evacuateur} :
+
+\begin{equation}
+X^{1,85} = 5,376Y
+\label{eq:profil_creager}
+\end{equation}
+
+Le coursier est bordé de murs bajoyers canalisant l'écoulement. La cuillère du saut de ski, calée à la cote \textbf{578 NGM}, permet de projeter le jet d'eau loin du pied aval du barrage. Le bec déviateur est tracé selon un arc de cercle de rayon \textbf{3 m} avec un angle de sortie de \textbf{40°} sur l'horizontale \cite{note_calcul_evacuateur}. La distance d'impact du jet est estimée à \textbf{29,5 m} pour la crue de projet.
+
+% SECTION 4.9 : DESCRIPTION DE LA VIDANGE DE FOND
+\section{Description de la vidange de fond}
+\label{sec:vidange_fond}
+
+La vidange de fond est un organe essentiel pour la gestion des sédiments et la vidange partielle ou totale de la retenue pour des besoins d'inspection ou de maintenance. Ses caractéristiques sont \cite{fiche_organes_restitution, note_calcul_vidange} :
+
+\begin{itemize}
+    \item \textbf{Implantation} : Rive gauche.
+    \item \textbf{Type} : Deux conduites en acier indépendantes.
+    \item \textbf{Diamètre des conduites} : \textbf{1000 mm} (initialement prévu en 800 mm dans l'APD, modifié en phase d'exécution pour réduire le temps de vidange).
+    \item \textbf{Longueur des conduites} : 22,00 m.
+    \item \textbf{Cote de calage à l'entrée} : \textbf{585,50 NGM} (ajustée par rapport à la cote 586,00 NGM de l'APD).
+    \item \textbf{Volume de retenue correspondant} : 932 788 m³.
+    \item \textbf{Capacité sous retenue normale} : \textbf{12 m³/s}.
+    \item \textbf{Temps de vidange de la retenue} : \textbf{5 jours}.
+    \item \textbf{Équipement hydromécanique} :
+    \begin{itemize}
+        \item 2 vannes à opercule (papillon) de diamètre 1000 mm par conduite (une vanne de garde et une vanne de réglage), pression nominale 10 Bar.
+        \item Une grille métallique de protection de dimensions 1,4 m x 1,4 m.
+        \item Commande électrique (moteur 3 kW, 400 V) ou manuelle (volant).
+    \end{itemize}
+    \item \textbf{Dissipation} : Bassin de dissipation en béton armé de 12 m de longueur, radier à la cote 579,50 NGM, prolongé par un canal en maçonnerie.
+\end{itemize}
+
+% SECTION 4.10 : DESCRIPTION DES PRISES D'EAU (AEP ET AGRICOLE)
+\section{Description des prises d'eau (AEP et agricole)}
+\label{sec:prises_eau}
+
+Le barrage est équipé de plusieurs prises d'eau pour satisfaire les besoins en eau potable et en irrigation \cite{fiche_synoptique, fiche_organes_restitution} :
+
+\begin{itemize}
+    \item \textbf{Prises d'eau potable (AEP)} : Trois conduites en acier de diamètre 200 mm, calées à différentes cotes pour permettre un tirage sélectif en fonction de la qualité de l'eau et du niveau de la retenue :
+    \begin{itemize}
+        \item Cote \textbf{595 NGM}.
+        \item Cote \textbf{590 NGM}.
+        \item Cote \textbf{586 NGM}.
+    \end{itemize}
+    Chaque conduite est équipée de vannes de contrôle.
+    \item \textbf{Prise agricole} : Une conduite en acier de diamètre 300 mm, calée à la cote \textbf{586,00 NGM}, avec une vanne de contrôle.
+\end{itemize}
+
+% SECTION 4.11 : DESCRIPTION DE LA GALERIE D'INJECTION ET DE DRAINAGE
+\section{Description de la galerie d'injection et de drainage}
+\label{sec:galerie}
+
+Une galerie visiteuse, reliant les deux rives, joue un rôle crucial dans la surveillance et la sécurité de l'ouvrage \cite{fiche_historique, fiche_synoptique} :
+\begin{itemize}
+    \item \textbf{Fonctions} :
+    \begin{itemize}
+        \item Permettre l'injection de coulis de ciment pour créer un voile d'étanchéité dans la fondation (injection).
+        \item Collecter les eaux de drainage pour mesurer et contrôler les sous-pressions (drainage).
+        \item Servir d'accès pour l'inspection et l'auscultation de l'intérieur du barrage.
+    \end{itemize}
+    \item \textbf{Caractéristiques} : La galerie a été surélevée à la cote \textbf{573,50 NGM} en phase d'exécution (contre 570 NGM à l'APD) pour éviter les risques d'inondation. Sa largeur a été portée à \textbf{3 m} pour faciliter les travaux de forage.
+\end{itemize}
+
+% SECTION 4.12 : DESCRIPTION DE LA DÉRIVATION PROVISOIRE
+\section{Description de la dérivation provisoire}
+\label{sec:derivation_provisoire}
+
+Pendant la construction, il a fallu dévier l'oued pour travailler à sec \cite{fiche_historique, fiche_synoptique} :
+\begin{itemize}
+    \item \textbf{Type} : Deux pertuis bétonnés disposés en rive gauche, traversant provisoirement le corps du barrage.
+    \item \textbf{Dimensions des pertuis} : 2 x 4,50 m de large x 5,00 m de haut.
+    \item \textbf{Crue de chantier} : Dimensionnée pour la crue vingtenale (Q20 = 310 m³/s).
+\end{itemize}
+
+% SECTION 4.13 : ASPECTS PARTICULIERS ET ADAPTATIONS EN COURS DE CHANTIER
+\section{Aspects particuliers et adaptations en cours de chantier}
+\label{sec:adaptations_chantier}
+
+Plusieurs adaptations ont été apportées au projet initial (APD) durant la phase d'exécution pour s'adapter aux conditions réelles du site ou pour optimiser l'ouvrage \cite{fiche_historique, note_geologique_2003} :
+
+\begin{itemize}
+    \item \textbf{Décalage de l'axe du barrage} : L'axe définitif a été décalé d'une trentaine de mètres en aval suite aux prospections géologiques qui ont révélé du rocher altéré sur la rive gauche.
+    \item \textbf{Modification du profil du barrage} : Le profil est passé d'un parement amont penté (0,2H/1V) à un parement amont \textbf{vertical}, et le parement aval de 0,8H/1V à \textbf{0,9H/1V}. La largeur en crête est passée de 3 m à \textbf{5 m}, et sa cote de 603,50 à \textbf{604,00 NGM}.
+    \item \textbf{Approfondissement des fouilles} : La découverte d'une zone de rocher très altéré en fond de vallée (épaisseur de 7 à 8 m) a nécessité un approfondissement des fouilles de 7 à 9 m, avec des cotes de fondation finales à 555 NGM (amont) et 556 NGM (aval).
+    \item \textbf{Élargissement du diamètre des conduites de vidange} : Le diamètre est passé de 800 mm à \textbf{1000 mm}, réduisant le temps de vidange de la retenue d'environ 64 \%.
+    \item \textbf{Surélévation de la galerie d'injection} : La galerie a été surélevée de la cote 570 NGM à \textbf{573,50 NGM} pour éviter les risques d'inondation.
+    \item \textbf{Substitution du BCR par du BCV pour le couronnement} : Le BCR prévu pour le couronnement (cotes 598,45 à 604,00 NGM) a été remplacé par du BCV en raison de l'espace de travail trop restreint pour les engins de compactage.
+\end{itemize}
+
+% SECTION 4.14 : CONCLUSION
+\section{Conclusion}
+\label{sec:conclusion_chap4}
+
+Le barrage Ahl Souss constitue un ouvrage hydraulique complexe, dont la conception a intégré des innovations technologiques comme le béton compacté au rouleau, et a su s'adapter aux contraintes géologiques et opérationnelles rencontrées en cours de chantier. La description détaillée de ses caractéristiques et de ses organes annexes, notamment l'évacuateur de crues et la vidange de fond, pose les bases nécessaires à la modélisation numérique qui fera l'objet de la suite de ce rapport.
+
+% ---
+% DEUXIEME PARTIE : REVUE DES LOGICIELS CFD
+% ---
+\part{DEUXIÈME PARTIE : REVUE DES LOGICIELS CFD}
+
+% ---
+% CHAPITRE 1 : Benchmark des logiciels de modélisation 3D
+% ---
+\chapter{Benchmark des logiciels de modélisation 3D}
+\label{chap:benchmark_logiciels}
+
+% SECTION 1.1 : INTRODUCTION
+\section{Introduction}
+\label{sec:introduction_benchmark}
+
+La modélisation 3D des écoulements dans les ouvrages hydrauliques est devenue un outil essentiel pour l'analyse et l'optimisation des performances. De nombreux logiciels CFD sont disponibles, chacun présentant des caractéristiques spécifiques en termes de méthodes numériques, de modèles physiques, de type de maillage et d'accessibilité (open source ou commercial). Ce chapitre propose une analyse comparative des principales solutions logicielles adaptées à la modélisation des écoulements à surface libre, afin de justifier le choix d'OpenFOAM pour la présente étude.
+
+% SECTION 1.2 : PRÉSENTATION DES LOGICIELS
+\section{Présentation des logiciels}
+\label{sec:presentation_logiciels}
+
+\subsection{TELEMAC-3D}
+\label{subsec:telemac}
+
+TELEMAC-3D est un code de calcul open source développé par le Laboratoire National d'Hydraulique et Environnement (LNHE) d'EDF R\&D. Il résout les équations de Navier-Stokes pour les écoulements à surface libre, en utilisant la méthode des \textbf{éléments finis}. Il est particulièrement adapté à l'hydrodynamique côtière, estuarienne et fluviale, ainsi qu'au transport de sédiments et à la qualité de l'eau. Sa flexibilité et sa gratuité en font un outil académique et professionnel de premier plan, mais sa prise en main peut être complexe \cite{galland1991telemac, hervouet2007hydrodynamics}.
+
+\subsection{Flow-3D}
+\label{subsec:flow3d}
+
+Flow-3D est un logiciel commercial CFD développé par Flow Science. Il est réputé pour sa capacité à modéliser avec précision les écoulements à surface libre grâce à la méthode \textbf{VOF (Volume of Fluid)}, dont il est l'un des pionniers \cite{hirt1981volume}. Il utilise un maillage structuré cartésien, ce qui simplifie la génération du maillage. Sa méthode \textbf{FAVOR (Fractional Area/Volume Obstacle Representation)} permet de représenter des géométries complexes sur un maillage simple \cite{flow2016user}. Il est très utilisé en hydraulique (déversoirs, ressauts, dissipateurs d'énergie) mais est payant.
+
+\subsection{ANSYS Fluent}
+\label{subsec:ansys_fluent}
+
+Ansys Fluent est l'un des logiciels CFD commerciaux les plus complets et les plus utilisés dans le monde, toutes industries confondues (aéronautique, automobile, énergie, hydraulique). Il utilise la méthode des \textbf{volumes finis} sur des maillages non structurés (polyédriques, tétraédriques, hexaédriques). Il dispose d'une très large bibliothèque de modèles physiques (turbulence, multiphasique, combustion, etc.) et d'une interface utilisateur graphique très avancée \cite{ansys2020fluent, matsson2022introduction}. Sa puissance a un coût élevé en termes de licence.
+
+\subsection{XFlow}
+\label{subsec:xflow}
+
+XFlow est un logiciel CFD commercial de nouvelle génération développé par Dassault Systèmes. Il se distingue par son approche innovante : il n'utilise pas de maillage traditionnel mais une méthode particulaire basée sur la \textbf{méthode de Lattice Boltzmann} \cite{chen1998lattice, kruger2017lattice}. Cette approche sans maillage est très efficace pour traiter des géométries complexes en mouvement et des écoulements instationnaires. Il est plus récent et son application en hydraulique "classique" est en développement.
+
+\subsection{STAR-CCM+}
+\label{subsec:starccm}
+
+STAR-CCM+ est un logiciel commercial CFD développé par Siemens. Il est reconnu pour son interface unifiée et son workflow intégré, de la préparation de la géométrie à l'analyse des résultats. Il utilise également la méthode des volumes finis et a popularisé l'utilisation de maillages polyédriques, qui offrent un bon compromis entre précision et nombre de cellules \cite{cd2019star, peric2005advantage}. Il est très présent dans les secteurs automobile et aéronautique.
+
+\subsection{OpenFOAM}
+\label{subsec:openfoam}
+
+OpenFOAM (Open Field Operation and Manipulation) est la principale solution \textbf{open source} en CFD. Développé par OpenCFD Ltd, il s'agit d'une bibliothèque de solveurs et d'outils écrits en C++, permettant de résoudre une vaste gamme de problèmes en mécanique des fluides (et des solides) \cite{weller1998tensorial, jasak2009openfoam}. Il utilise la méthode des volumes finis sur des maillages non structurés. Son principal avantage est sa gratuité, sa transparence (code source accessible) et sa flexibilité : l'utilisateur peut modifier les solveurs existants ou en créer de nouveaux. L'inconvénient est l'absence d'interface graphique native et une courbe d'apprentissage plus raide.
+
+\subsection{SimScale}
+\label{subsec:simscale}
+
+SimScale est une plateforme de simulation \textbf{cloud} (SaaS - Software as a Service). Elle propose un accès à des solveurs de CFD (basés sur OpenFOAM) et d'analyse par éléments finis via un navigateur web \cite{simscale2021documentation, bletzinger2017cloud}. Elle fonctionne sur un modèle freemium (compte gratuit avec des limitations) ou par abonnement. Son avantage est l'accessibilité sans nécessiter de matériel puissant, mais la confidentialité des données peut être une préoccupation.
+
+\subsection{Autres logiciels}
+\label{subsec:autres_logiciels}
+
+D'autres logiciels complètent le paysage des solutions disponibles :
+\begin{itemize}
+    \item \textbf{Autodesk CFD} : Solution commerciale d'Autodesk, basée sur la méthode des éléments finis, intégrée dans l'écosystème de conception.
+    \item \textbf{ANSYS CFX} : Autre solveur CFD majeur d'Ansys, réputé pour sa robustesse et sa précision, notamment pour les turbomachines.
+    \item \textbf{MIKE 3 Wave FM} : Logiciel commercial de DHI, spécialisé dans l'hydrodynamique côtière et maritime (vagues, courants) \cite{dhi2020mike}.
+    \item \textbf{COMSOL Multiphysics} : Plateforme commerciale permettant de coupler la CFD avec d'autres physiques (électromagnétisme, thermique, mécanique des structures) \cite{comsol2021reference}.
+\end{itemize}
+
+% SECTION 1.3 : COMPARAISON ENTRE LES LOGICIELS
+\section{Comparaison entre les logiciels}
+\label{sec:comparaison_logiciels}
+
+Le tableau suivant regroupe les principales caractéristiques des logiciels présentés :
+
+\begin{table}[H]
+    \centering
+    \caption{Comparaison des principaux logiciels de CFD}
+    \label{tab:comparaison_logiciels_cfd}
+    \begin{tabular}{|l|c|c|c|c|c|}
+        \hline
+        \textbf{Logiciel} & \textbf{Interface graphique} & \textbf{Méthode de discrétisation} & \textbf{Maillage 3D} & \textbf{Open source} & \textbf{Payant/Gratuit} \\
+        \hline
+        TELEMAC-3D & Oui & Éléments finis & Non structuré & \textbf{Oui} & \textbf{Gratuit} \\
+        \hline
+        Flow-3D & Oui & Volumes finis & Cartésien structuré & Non & Payant \\
+        \hline
+        ANSYS Fluent & Oui & Volumes finis & Non structuré (polyédrique) & Non & Payant \\
+        \hline
+        XFlow & Oui & Lattice Boltzmann & \textbf{Sans maillage} (particulaire) & Non & Payant \\
+        \hline
+        STAR-CCM+ & Oui & Volumes finis & Non structuré (polyédrique) & Non & Payant \\
+        \hline
+        \textbf{OpenFOAM} & \textbf{Non} (pré/post via ParaView) & Volumes finis & Non structuré & \textbf{Oui} & \textbf{Gratuit} \\
+        \hline
+        SimScale & Oui (cloud) & Volumes finis / Éléments finis & Automatique (cloud) & \textbf{Basé sur OpenFOAM} & Freemium \\
+        \hline
+        ANSYS CFX & Oui & Volumes finis (couplé) & Non structuré & Non & Payant \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% SECTION 1.4 : LE LOGICIEL AUTODESK REVIT
+\section{Le logiciel Autodesk Revit}
+\label{sec:revit}
+
+Bien que n'étant pas un logiciel de CFD, Autodesk Revit joue un rôle important dans la chaîne de modélisation pour la création de la géométrie.
+
+\subsection{Présentation du logiciel}
+\label{subsec:presentation_revit}
+
+Autodesk Revit est un logiciel de \textbf{BIM (Building Information Modeling)} dédié à l'architecture, l'ingénierie et la construction. Contrairement aux logiciels de CAO traditionnels (comme AutoCAD) qui manipulent des entités géométriques indépendantes (lignes, cercles), Revit travaille avec des \textbf{objets paramétriques intelligents} \cite{autodesk2021revit, eastman2011bim}. Un mur, une fenêtre, une poutre ne sont pas de simples dessins, mais des objets qui contiennent des informations (matériau, dimensions, fonction) et des relations avec les autres objets.
+
+\subsection{Intérêt pour la modélisation des ouvrages hydrauliques}
+\label{subsec:interet_revit}
+
+Pour la modélisation des ouvrages hydrauliques complexes comme le barrage Ahl Souss, Revit présente plusieurs avantages significatifs :
+
+\begin{itemize}
+    \item \textbf{Modélisation paramétrique} : Les éléments du barrage (corps du barrage, seuil Creager, coursier, conduites de vidange, murs bajoyers, prises d'eau) peuvent être créés avec des paramètres dimensionnels. Si une cote change, tout le modèle se met à jour automatiquement, garantissant la cohérence géométrique \cite{kensek2014building}.
+    \item \textbf{Exportation vers les formats CAO standards} : Revit permet d'exporter les modèles 3D vers de nombreux formats, notamment le format \textbf{STL (Standard Tessellation Language)} \cite{szalapaj2005contemporary}. Ce format, qui décrit une géométrie par un maillage de triangles, est compatible avec la plupart des logiciels de CFD, dont OpenFOAM.
+    \item \textbf{Intégration BIM} : La maquette numérique ne se limite pas à la géométrie ; elle peut intégrer des données essentielles pour la gestion de l'ouvrage (volumes de béton par zone, type de matériau, dates de construction, etc.).
+    \item \textbf{Coordination multidisciplinaire} : Dans un projet de barrage, plusieurs corps d'état interviennent (génie civil, hydromécanique, instrumentation). Revit permet de coordonner tous ces acteurs autour d'un modèle unique et partagé, réduisant les risques d'erreur et d'incohérence.
+\end{itemize}
+
+\subsection{Démarche de modélisation}
+\label{subsec:demarche_revit}
+
+Le processus de modélisation avec Revit pour notre étude comprend les étapes suivantes :
+\begin{enumerate}
+    \item Création d'un projet Revit avec les unités appropriées (mètres).
+    \item Modélisation du terrain naturel à partir des données topographiques (courbes de niveau).
+    \item Création du corps du barrage par extrusion du profil type (paramètres : cote de fondation, fruit des parements, largeur en crête).
+    \item Modélisation de l'évacuateur de crues (seuil Creager, coursier, cuillère).
+    \item Modélisation de la vidange de fond (conduites, chambre des vannes, bassin de dissipation).
+    \item Modélisation des prises d'eau et de la galerie.
+    \item Exportation au format STL pour une utilisation dans OpenFOAM \cite{krygiel2008green}.
+\end{enumerate}
+
+% SECTION 1.5 : CONCLUSION
+\section{Conclusion}
+\label{sec:conclusion_benchmark}
+
+Le choix d'OpenFOAM pour cette étude se justifie par plusieurs avantages : sa gratuité, l'accès au code source permettant une transparence totale et une flexibilité maximale, sa capacité de calcul parallèle (HPC) pour traiter des géométries complexes, et sa large communauté d'utilisateurs qui garantit un support et un partage de connaissances. Sa structure modulaire permet d'adapter précisément les modèles physiques aux spécificités des ouvrages du barrage Ahl Souss. Associé à Autodesk Revit pour la modélisation géométrique paramétrique, cet ensemble d'outils constitue une chaîne de simulation complète, performante et économiquement accessible.
+
+% ---
+% TROISIEME PARTIE : DESCRIPTION D'OPENFOAM, STRUCTURES, ALGORITHMES ET OUTILS
+% ---
+\part{TROISIÈME PARTIE : DESCRIPTION D'OPENFOAM, STRUCTURES, ALGORITHMES ET OUTILS}
+
+% ---
+% CHAPITRE 1 : Structure d'un code CFD
+% ---
+\chapter{Structure d'un code CFD}
+\label{chap:structure_code_cfd}
+
+% SECTION 1.1 : INTRODUCTION
+\section{Introduction}
+\label{sec:introduction_structure_cfd}
+
+La mécanique des fluides numérique (CFD) permet de simuler des écoulements complexes en résolvant numériquement les équations de conservation. Pour cela, un code CFD suit une structure bien définie, articulée autour de trois étapes principales : le pré-traitement, la résolution et le post-traitement \cite{wendt2009computational}. Chacune de ces phases est indispensable pour garantir la fiabilité des résultats, depuis la préparation du modèle jusqu'à l'analyse des données simulées.
+
+% SECTION 1.2 : PRÉ-TRAITEMENT (PRE-PROCESSING)
+\section{Pré-traitement (Pre-processing)}
+\label{sec:preprocessing}
+
+Cette étape consiste à préparer les données nécessaires à la simulation. Cela inclut la définition du domaine géométrique sous forme maillée, le choix des phénomènes physiques à modéliser (comme la turbulence, les écoulements multiphasiques ou la cavitation), ainsi que la spécification des propriétés physiques du fluide et des conditions aux limites adaptées au cas étudié \cite{thompson1999handbook}. Les grandeurs à calculer, telles que la vitesse, la pression et la température, sont associées aux nœuds de chaque cellule du maillage.
+
+La qualité du maillage est cruciale pour la précision des résultats. Les paramètres clés incluent la résolution spatiale, la qualité des cellules (skewness, orthogonalité) et le raffinement local dans les zones à forts gradients \cite{knupp1993fundamentals}.
+
+% SECTION 1.3 : RÉSOLUTION (PROCESSING)
+\section{Résolution (Processing)}
+\label{sec:processing}
+
+Le rôle du solveur est d'appliquer les algorithmes permettant \cite{patankar1980numerical} :
+\begin{itemize}
+    \item D'intégrer les équations de conservation sur chaque volume de contrôle.
+    \item De transformer ces équations intégrales en un système algébrique.
+    \item D'en estimer la solution à l'aide de méthodes itératives.
+\end{itemize}
+
+La majorité des logiciels de CFD, dont OpenFOAM, utilise la méthode des \textbf{volumes finis}, qui repose sur l'application directe des bilans sur chaque volume de contrôle. Cette approche est largement adoptée en raison de sa rigueur et de son efficacité, ce qui explique son succès auprès des éditeurs de logiciels de simulation numérique \cite{versteeg2007introduction}.
+
+% SECTION 1.4 : POST-TRAITEMENT (POST-PROCESSING)
+\section{Post-traitement (Post-processing)}
+\label{sec:postprocessing}
+
+Le post-traitement vise avant tout à évaluer la qualité de la solution obtenue. Il s'agit notamment de vérifier si cette solution est indépendante de la taille du maillage, du critère de convergence et des schémas numériques utilisés \cite{roache1998verification}. Il est également essentiel de s'assurer que le modèle de turbulence ainsi que les conditions aux limites ont été choisis de manière pertinente, et d'analyser dans quelle mesure les résultats dépendent de ces choix.
+
+En général, le solveur fournit une grande quantité de données brutes, telles que les champs de vitesse (u, v, w), de pression (p), etc., pour chaque point du maillage. Ces données doivent être converties en représentations visuelles afin de faciliter leur analyse et leur compréhension \cite{schroeder2006visualization}.
+
+Les principaux résultats généralement présentés lors du post-traitement sont les suivants \cite{hansen2011visualization} :
+\begin{itemize}
+    \item La représentation de la géométrie du domaine et des détails du maillage.
+    \item L'évolution de la convergence au cours des itérations (graphique des résidus).
+    \item Les champs et profils de vitesse (contours, vecteurs, lignes de courant).
+    \item Les tracés des distributions de pression.
+    \item Les animations et visualisations dynamiques des écoulements simulés.
+\end{itemize}
+
+% SECTION 1.5 : CONCLUSION
+\section{Conclusion}
+\label{sec:conclusion_structure_cfd}
+
+La simulation CFD repose sur trois étapes essentielles : le pré-traitement, la résolution et le post-traitement. Chacune joue un rôle clé dans la qualité et l'interprétation des résultats. Une bonne préparation du modèle, un solveur fiable et une analyse rigoureuse garantissent des simulations précises et exploitables.
+
+% ---
+% CHAPITRE 2 : Structure générale d'un cas OpenFOAM
+% ---
+\chapter{Structure générale d'un cas OpenFOAM}
+\label{chap:structure_openfoam}
+
+% SECTION 2.1 : INTRODUCTION
+\section{Introduction}
+\label{sec:introduction_openfoam}
+
+OpenFOAM adopte une structure de fichiers standardisée, organisée de manière logique pour séparer les différents aspects du cas \cite{openfoam2022guide}. Cette hiérarchie de fichiers facilite la lisibilité, la modification et l'automatisation des cas de calcul. Un cas OpenFOAM comprend trois répertoires principaux : \textbf{"0"}, \textbf{"constant"} et \textbf{"system"} \cite{greenshields2020openfoam}.
+
+% SECTION 2.2 : LES SOLVEURS DISPONIBLES DANS OPENFOAM
+\section{Les solveurs disponibles dans OpenFOAM}
+\label{sec:solveurs_openfoam}
+
+OpenFOAM propose une vaste bibliothèque de solveurs classés par type d'écoulement \cite{jasak1996error} :
+
+\begin{table}[H]
+    \centering
+    \caption{Classification des solveurs dans OpenFOAM}
+    \label{tab:solveurs_openfoam}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{Type d'écoulement} & \textbf{Solveurs} & \textbf{Description} \\
+        \hline
+        Basique & laplacianFoam & Diffusion thermique dans un solide \\
+        \hline
+        & potentialFoam & Écoulement potentiel pour initialisation \\
+        \hline
+        Incompressible & icoFoam & Transitoire, laminaire, isotherme \\
+        \hline
+        & simpleFoam & Permanent, turbulent (algorithme SIMPLE) \\
+        \hline
+        & pisoFoam & Transitoire, turbulent (algorithme PISO) \\
+        \hline
+        & pimpleFoam & Transitoire, grand pas de temps (algorithme PIMPLE) \\
+        \hline
+        Compressible & rhoCentralFoam & Basé sur Kurganov-Tadmor, ondes de choc \\
+        \hline
+        & rhoPimpleFoam & Transitoire, laminaire ou turbulent \\
+        \hline
+        & rhoSimpleFoam & Permanent, RANS \\
+        \hline
+        Multiphase & \textbf{interFoam} & \textbf{2 fluides incompressibles, méthode VOF} \\
+        \hline
+        & cavitatingFoam & Transitoire, cavitation \\
+        \hline
+        & multiphaseInterFoam & n fluides incompressibles \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Pour notre étude, le solveur \textbf{`interFoam`} est choisi car il est spécifiquement conçu pour les écoulements diphasiques incompressibles avec suivi d'interface par la méthode VOF \cite{rusche2002computational}, ce qui est parfait pour modéliser la surface libre de l'eau dans l'évacuateur de crues.
+
+% SECTION 2.3 : LES ALGORITHMES DE RÉSOLUTION NUMÉRIQUE
+\section{Les algorithmes de résolution numérique}
+\label{sec:algorithmes_resolution}
+
+Les équations de Navier-Stokes établissent une relation linéaire entre la pression et la vitesse. Cependant, la pression ne dispose pas d'une équation propre permettant sa résolution directe. Plusieurs algorithmes sont disponibles pour assurer le couplage pression-vitesse \cite{patankar1972calculation} :
+
+\subsection{L'algorithme SIMPLE}
+\label{subsec:simple}
+
+L'algorithme SIMPLE (Semi-Implicit Method for Pressure-Linked Equations) est une méthode itérative pour les écoulements \textbf{stationnaires} \cite{caretto1973two}. Il procède par une séquence d'étapes à chaque itération : estimation d'un champ de vitesse à partir d'un champ de pression estimé, puis résolution d'une équation de correction de pression pour satisfaire la continuité, et enfin mise à jour de la pression et de la vitesse. Le processus est répété jusqu'à convergence.
+
+\subsection{L'algorithme PISO}
+\label{subsec:piso}
+
+L'algorithme PISO (Pressure Implicit with Splitting of Operator) est spécifiquement adapté aux écoulements \textbf{transitoires} \cite{issa1986solution}. À chaque pas de temps, il effectue une étape de prédiction de la vitesse, suivie de plusieurs étapes de correction de pression (généralement deux) pour satisfaire la continuité de manière plus précise que SIMPLE.
+
+\subsection{L'algorithme PIMPLE}
+\label{subsec:pimple}
+
+L'algorithme PIMPLE combine les deux approches, PISO et SIMPLE. Il s'agit d'une implémentation de l'algorithme PISO avec la possibilité d'utiliser un facteur de sous-relaxation (comme dans SIMPLE) et d'effectuer des itérations externes à l'intérieur d'un même pas de temps. Cela permet d'utiliser des pas de temps plus grands que ceux imposés par la condition de Courant, améliorant ainsi l'efficacité pour les simulations transitoires avec des maillages complexes \cite{holzmann2017mathematics}.
+
+% SECTION 2.4 : STABILITÉ ET CONVERGENCE DES CALCULS
+\section{Stabilité et convergence des calculs}
+\label{sec:stabilite_convergence}
+
+\subsection{Définitions}
+\label{subsec:definitions}
+
+La \textbf{stabilité} en simulation CFD désigne la capacité d'une méthode numérique à générer des résultats bornés et réalistes, sans amplification incontrôlée des erreurs numériques \cite{courant1928uber}. La \textbf{convergence} correspond à la capacité d'une méthode numérique à fournir une solution qui se rapproche de la solution exacte des équations discrétisées à mesure que le calcul itératif progresse (ou que le maillage est raffiné) \cite{ferziger2002computational}.
+
+\subsection{Paramètres influençant la convergence}
+\label{subsec:parametres_convergence}
+
+Les principaux paramètres influençant la convergence, la stabilité et la durée d'une simulation CFD sont \cite{hirsch2007numerical} :
+\begin{itemize}
+    \item La discrétisation spatiale (taille et qualité du maillage).
+    \item La discrétisation temporelle (pas de temps Δt).
+    \item Le choix du modèle de turbulence et de ses paramètres.
+    \item La méthode de résolution et le type de solveur (SIMPLE, PISO, etc.).
+    \item Les conditions aux limites et initiales.
+    \item Les propriétés physiques du fluide (ρ, μ).
+\end{itemize}
+
+\subsection{Critères de stabilité}
+\label{subsec:criteres_stabilite}
+
+Pour garantir la stabilité d'un calcul CFD explicite, il est essentiel de respecter le critère de Courant-Friedrichs-Lewy (CFL) \cite{leveque2007finite}. Le nombre de Courant est défini par :
+
+\begin{equation}
+Co = \frac{|U| \cdot \Delta t}{\Delta x}
+\label{eq:courant}
+\end{equation}
+
+La condition de stabilité s'exprime par \( Co \leq 1 \), garantissant que l'information (une particule fluide) ne parcourt pas plus d'une cellule à chaque pas de temps \cite{trefethen1996finite}. Pour les schémas implicites, la condition est moins restrictive, mais un Co trop grand peut encore dégrader la précision.
+
+% SECTION 2.5 : LE SYSTÈME DE FICHIERS D'OPENFOAM
+\section{Le système de fichiers d'OpenFOAM}
+\label{sec:fichiers_openfoam}
+
+\subsection{Le dossier "0"}
+\label{subsec:dossier_0}
+
+Le dossier "0" contient les dictionnaires définissant les \textbf{conditions initiales et aux limites} pour chaque champ (pression `p`, vitesse `U`, fraction volumique `alpha.water`, paramètres de turbulence `k`, `omega`, `nut`) à l'instant initial (t=0) \cite{moukalled2016finite}.
+
+Les principales conditions aux limites disponibles dans OpenFOAM sont \cite{openfoam2022boundary} :
+
+\begin{table}[H]
+    \centering
+    \caption{Conditions aux limites courantes dans OpenFOAM}
+    \label{tab:boundary_conditions}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{Type} & \textbf{Description} & \textbf{Application typique} \\
+        \hline
+        `fixedValue` & Valeur fixée par l'utilisateur & Vitesse d'entrée (`U`) \\
+        \hline
+        `zeroGradient` & Gradient normal nul & Sortie libre (`p`) \\
+        \hline
+        `fixedGradient` & Gradient normal fixé & Flux de chaleur imposé \\
+        \hline
+        `inletOutlet` & `fixedValue` en entrée, `zeroGradient` en sortie & Sortie avec risque de reflux (`U`) \\
+        \hline
+        `totalPressure` & Pression totale constante & Entrée avec pression imposée \\
+        \hline
+        `pressureInletOutletVelocity` & U évalué à partir de p & Surface libre, sortie \\
+        \hline
+        \textbf{`noSlip`} & \textbf{Vitesse nulle à la paroi} & \textbf{Parois solides} \\
+        \hline
+        `slip` & Glissement parfait & Symétrie \\
+        \hline
+        `kqRWallFunction` & Condition de paroi pour k, q, R & Parois turbulentes \\
+        \hline
+        `omegaWallFunction` & Condition de paroi pour ω & Parois turbulentes \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Le dossier "constant"}
+\label{subsec:dossier_constant}
+
+Le dossier "constant" regroupe les paramètres indépendants du temps \cite{greenshields2020constant} :
+\begin{itemize}
+    \item \textbf{Propriétés physiques} : `transportProperties` (viscosité, masse volumique, tension superficielle pour les écoulements multiphasiques).
+    \item \textbf{Modélisation de la turbulence} : `turbulenceProperties` (choix du modèle RANS/LES, type de modèle `kOmegaSST`, etc.).
+    \item \textbf{Maillage} : sous-dossier `polyMesh` contenant la description complète du maillage (points, faces, cellules, frontières).
+    \item \textbf{Géométries STL} : sous-dossier `triSurface` pour les fichiers de surface (utile pour `snappyHexMesh`).
+\end{itemize}
+
+\subsection{Le dossier "system"}
+\label{subsec:dossier_system}
+
+Le dossier "system" contient les fichiers de contrôle de la simulation \cite{jasak2009openfoam} :
+\begin{itemize}
+    \item \textbf{`controlDict`} : paramètres temporels (startTime, endTime, deltaT, writeInterval).
+    \item \textbf{`fvSchemes`} : schémas de discrétisation pour les dérivées spatiales (`gradSchemes`, `divSchemes`, `laplacianSchemes`) et temporelles (`ddtSchemes`).
+    \item \textbf{`fvSolution`} : solveurs linéaires, critères de convergence et algorithmes de couplage (SIMPLE, PISO, PIMPLE).
+    \item \textbf{`blockMeshDict`} : génération du maillage structuré de base.
+    \item \textbf{`snappyHexMeshDict`} : configuration du raffinement autour des géométries complexes (STL) et ajout de couches limites.
+    \item \textbf{`decomposeParDict`} : configuration du calcul parallèle (décomposition du domaine).
+\end{itemize}
+
+% SECTION 2.6 : OUTIL DE VISUALISATION ET DE POST-TRAITEMENT (PARAVIEW)
+\section{Outil de visualisation et de post-traitement (ParaView)}
+\label{sec:paraview}
+
+\textbf{ParaView} constitue l'outil principal de visualisation et de post-traitement des résultats dans OpenFOAM \cite{ahrens2005paraview}. C'est un logiciel open source puissant qui s'appuie sur un module de lecture intégré à OpenFOAM (`foamToVTK` ou `paraFoam`). Pour le lancer, il suffit d'exécuter la commande `paraFoam` depuis le répertoire du cas concerné.
+
+Cet outil très puissant permet d'afficher divers types de données tels que des champs scalaires (pression, température), des vecteurs (vitesse), des lignes de courant ou encore des surfaces de niveau (pour la surface libre avec `alpha.water`) \cite{ayachit2015paraview}. Il facilite la création d'animations pour visualiser l'évolution des phénomènes simulés.
+
+% SECTION 2.7 : MODÉLISATION DE LA SURFACE LIBRE - MÉTHODE VOF
+\section{Modélisation de la surface libre - Méthode VOF}
+\label{sec:vof}
+
+La méthode \textbf{VOF (Volume of Fluid)} est la plus répandue pour suivre l'interface entre deux fluides non miscibles (par exemple, l'eau et l'air) \cite{hirt1981volume}. Elle utilise un champ scalaire \(\alpha\) (fraction volumique) défini par :
+
+\begin{equation}
+\alpha = \frac{V_{eau}}{V_{cellule}}
+\label{eq:vof_alpha}
+\end{equation}
+
+\(\alpha\) varie entre 0 (cellule pleine d'air) et 1 (cellule pleine d'eau). L'interface est située dans les cellules où \(0 < \alpha < 1\). Le transport de \(\alpha\) est régi par l'équation d'advection \cite{rider1998reconstructing} :
+
+\begin{equation}
+\frac{\partial \alpha}{\partial t} + \nabla \cdot (\alpha \vec{U}) = 0
+\label{eq:vof_transport}
+\end{equation}
+
+Les propriétés du fluide (masse volumique \(\rho\) et viscosité \(\mu\)) sont ensuite calculées par une moyenne pondérée \cite{scardovelli1999direct} :
+
+\begin{align}
+\rho &= \alpha \rho_{eau} + (1-\alpha)\rho_{air} \label{eq:vof_rho} \\
+\mu &= \alpha \mu_{eau} + (1-\alpha)\mu_{air} \label{eq:vof_mu}
+\end{align}
+
+Le solveur `interFoam` d'OpenFOAM implémente cette méthode avec des techniques avancées de compression de l'interface pour maintenir sa netteté.
+
+% SECTION 2.8 : CONCLUSION
+\section{Conclusion}
+\label{sec:conclusion_openfoam}
+
+Ce chapitre a permis d'explorer la structure d'un cas de modélisation dans OpenFOAM, en abordant les différents solveurs disponibles, les algorithmes de résolution numérique (SIMPLE, PISO, PIMPLE), ainsi que les notions essentielles de stabilité et de convergence des calculs. L'organisation des dossiers du logiciel a également été examinée, mettant en lumière la clarté et la logique qui facilitent la gestion des simulations. La méthode VOF, implémentée dans le solveur `interFoam`, est l'outil idéal pour notre modélisation de l'écoulement dans l'évacuateur de crues.
+
+Il ressort de cette étude que la richesse des solveurs et des algorithmes proposés par OpenFOAM permet de traiter une large gamme de problématiques en mécanique des fluides numérique. Le respect des critères de stabilité et de convergence reste essentiel pour garantir la qualité et la fiabilité des résultats obtenus.
+
+% ------------------------------------------------------------------
+% RÉFÉRENCES BIBLIOGRAPHIQUES
+% ------------------------------------------------------------------
+\newpage
+\begin{thebibliography}{99}
+
+% Ouvrages académiques fondamentaux
+\bibitem{versteeg2007introduction}
+Versteeg, H. K., \& Malalasekera, W. (2007). \emph{An Introduction to Computational Fluid Dynamics: The Finite Volume Method} (2nd ed.). Pearson Education.
+
+\bibitem{heller2011scale}
+Heller, V. (2011). Scale effects in physical hydraulic engineering models. \emph{Journal of Hydraulic Research}, 49(3), 293-306.
+
+\bibitem{ferziger2002computational}
+Ferziger, J. H., \& Perić, M. (2002). \emph{Computational Methods for Fluid Dynamics} (3rd ed.). Springer.
+
+\bibitem{roychowdhury2020computational}
+Roychowdhury, D. G. (2020). \emph{Computational Fluid Dynamics for Incompressible Flows}.
+
+\bibitem{patankar1980numerical}
+Patankar, S. V. (1980). \emph{Numerical Heat Transfer and Fluid Flow}. Hemisphere Publishing Corporation.
+
+\bibitem{tu2018computational}
+Tu, J., Yeoh, G. H., \& Liu, C. (2018). \emph{Computational Fluid Dynamics: A Practical Approach} (3rd ed.). Butterworth-Heinemann.
+
+\bibitem{schlichting2016boundary}
+Schlichting, H., \& Gersten, K. (2016). \emph{Boundary-Layer Theory} (9th ed.). Springer.
+
+\bibitem{anderson1995computational}
+Anderson, J. D. (1995). \emph{Computational Fluid Dynamics: The Basics with Applications}. McGraw-Hill.
+
+\bibitem{batchelor1967introduction}
+Batchelor, G. K. (1967). \emph{An Introduction to Fluid Dynamics}. Cambridge University Press.
+
+\bibitem{panton2013incompressible}
+Panton, R. L. (2013). \emph{Incompressible Flow} (4th ed.). John Wiley \& Sons.
+
+\bibitem{currie2012fundamental}
+Currie, I. G. (2012). \emph{Fundamental Mechanics of Fluids} (4th ed.). CRC Press.
+
+\bibitem{white2015fluid}
+White, F. M. (2015). \emph{Fluid Mechanics} (8th ed.). McGraw-Hill Education.
+
+\bibitem{kundu2015fluid}
+Kundu, P. K., Cohen, I. M., \& Dowling, D. R. (2015). \emph{Fluid Mechanics} (6th ed.). Academic Press.
+
+\bibitem{wendt2009computational}
+Wendt, J. F. (2009). \emph{Computational Fluid Dynamics: An Introduction} (3rd ed.). Springer.
+
+\bibitem{tennekes1972first}
+Tennekes, H., \& Lumley, J. L. (1972). \emph{A First Course in Turbulence}. MIT Press.
+
+\bibitem{pope2000turbulent}
+Pope, S. B. (2000). \emph{Turbulent Flows}. Cambridge University Press.
+
+\bibitem{davidson2015turbulence}
+Davidson, P. A. (2015). \emph{Turbulence: An Introduction for Scientists and Engineers} (2nd ed.). Oxford University Press.
+
+\bibitem{reynolds1883experimental}
+Reynolds, O. (1883). An experimental investigation of the circumstances which determine whether the motion of water shall be direct or sinuous. \emph{Philosophical Transactions of the Royal Society}, 174, 935-982.
+
+\bibitem{wilcox2006turbulence}
+Wilcox, D. C. (2006). \emph{Turbulence Modeling for CFD} (3rd ed.). DCW Industries.
+
+\bibitem{sagaut2006large}
+Sagaut, P. (2006). \emph{Large Eddy Simulation for Incompressible Flows: An Introduction} (3rd ed.). Springer.
+
+\bibitem{moin1998direct}
+Moin, P., \& Mahesh, K. (1998). Direct numerical simulation: a tool in turbulence research. \emph{Annual Review of Fluid Mechanics}, 30(1), 539-578.
+
+\bibitem{lesieur2005large}
+Lesieur, M., Métais, O., \& Comte, P. (2005). \emph{Large-Eddy Simulations of Turbulence}. Cambridge University Press.
+
+\bibitem{piomelli1999large}
+Piomelli, U. (1999). Large-eddy simulation: achievements and challenges. \emph{Progress in Aerospace Sciences}, 35(4), 335-362.
+
+\bibitem{reynolds1895dynamical}
+Reynolds, O. (1895). On the dynamical theory of incompressible viscous fluids and the determination of the criterion. \emph{Philosophical Transactions of the Royal Society of London A}, 186, 123-164.
+
+\bibitem{hinze1975turbulence}
+Hinze, J. O. (1975). \emph{Turbulence} (2nd ed.). McGraw-Hill.
+
+\bibitem{rodi1993turbulence}
+Rodi, W. (1993). \emph{Turbulence Models and Their Application in Hydraulics} (3rd ed.). CRC Press.
+
+\bibitem{durbin2010statistical}
+Durbin, P. A., \& Pettersson Reif, B. A. (2010). \emph{Statistical Theory and Modeling for Turbulent Flows} (2nd ed.). John Wiley \& Sons.
+
+\bibitem{launder1972lectures}
+Launder, B. E., \& Spalding, D. B. (1972). \emph{Lectures in Mathematical Models of Turbulence}. Academic Press.
+
+\bibitem{boussinesq1877essai}
+Boussinesq, J. (1877). Essai sur la théorie des eaux courantes. \emph{Mémoires présentés par divers savants à l'Académie des Sciences}, 23(1), 1-680.
+
+\bibitem{schmitt2007boussinesq}
+Schmitt, F. G. (2007). About Boussinesq's turbulent viscosity hypothesis. \emph{Comptes Rendus Mécanique}, 335(9-10), 617-628.
+
+\bibitem{prandtl1925bericht}
+Prandtl, L. (1925). Bericht über Untersuchungen zur ausgebildeten Turbulenz. \emph{Zeitschrift für Angewandte Mathematik und Mechanik}, 5(2), 136-139.
+
+\bibitem{prandtl1945uber}
+Prandtl, L. (1945). Über ein neues Formelsystem für die ausgebildete Turbulenz. \emph{Nachrichten von der Akademie der Wissenschaften in Göttingen}, 6-19.
+
+\bibitem{hanjalic2011modelling}
+Hanjalić, K., \& Launder, B. E. (2011). \emph{Modelling Turbulence in Engineering and the Environment: Second-Moment Routes to Closure}. Cambridge University Press.
+
+\bibitem{jones1972prediction}
+Jones, W. P., \& Launder, B. E. (1972). The prediction of laminarization with a two-equation model of turbulence. \emph{International Journal of Heat and Mass Transfer}, 15(2), 301-314.
+
+\bibitem{launder1974application}
+Launder, B. E., \& Sharma, B. I. (1974). Application of the energy-dissipation model of turbulence to the calculation of flow near a spinning disc. \emph{Letters in Heat and Mass Transfer}, 1(2), 131-138.
+
+\bibitem{launder1974numerical}
+Launder, B. E., \& Spalding, D. B. (1974). The numerical computation of turbulent flows. \emph{Computer Methods in Applied Mechanics and Engineering}, 3(2), 269-289.
+
+\bibitem{wilcox1988reassessment}
+Wilcox, D. C. (1988). Reassessment of the scale-determining equation for advanced turbulence models. \emph{AIAA Journal}, 26(11), 1299-1310.
+
+\bibitem{wilcox2008formulation}
+Wilcox, D. C. (2008). Formulation of the k-ω turbulence model revisited. \emph{AIAA Journal}, 46(11), 2823-2838.
+
+\bibitem{menter1994two}
+Menter, F. R. (1994). Two-equation eddy-viscosity turbulence models for engineering applications. \emph{AIAA Journal}, 32(8), 1598-1605.
+
+\bibitem{menter2003ten}
+Menter, F. R., Kuntz, M., \& Langtry, R. (2003). Ten years of industrial experience with the SST turbulence model. \emph{Turbulence, Heat and Mass Transfer 4}, 625-632.
+
+\bibitem{hirsch2007numerical}
+Hirsch, C. (2007). \emph{Numerical Computation of Internal and External Flows} (2nd ed.). Butterworth-Heinemann.
+
+\bibitem{tannehill1997computational}
+Tannehill, J. C., Anderson, D. A., \& Pletcher, R. H. (1997). \emph{Computational Fluid Mechanics and Heat Transfer} (2nd ed.). Taylor \& Francis.
+
+\bibitem{smith1985numerical}
+Smith, G. D. (1985). \emph{Numerical Solution of Partial Differential Equations: Finite Difference Methods} (3rd ed.). Oxford University Press.
+
+\bibitem{strikwerda2004finite}
+Strikwerda, J. C. (2004). \emph{Finite Difference Schemes and Partial Differential Equations} (2nd ed.). SIAM.
+
+\bibitem{zienkiewicz2013finite}
+Zienkiewicz, O. C., Taylor, R. L., \& Zhu, J. Z. (2013). \emph{The Finite Element Method: Its Basis and Fundamentals} (7th ed.). Butterworth-Heinemann.
+
+\bibitem{reddy2006introduction}
+Reddy, J. N. (2006). \emph{An Introduction to the Finite Element Method} (3rd ed.). McGraw-Hill.
+
+\bibitem{hughes2012finite}
+Hughes, T. J. R. (2012). \emph{The Finite Element Method: Linear Static and Dynamic Finite Element Analysis}. Dover Publications.
+
+\bibitem{leveque2002finite}
+LeVeque, R. J. (2002). \emph{Finite Volume Methods for Hyperbolic Problems}. Cambridge University Press.
+
+\bibitem{eymard2000finite}
+Eymard, R., Gallouët, T., \& Herbin, R. (2000). Finite volume methods. \emph{Handbook of Numerical Analysis}, 7, 713-1018.
+
+\bibitem{moukalled2016finite}
+Moukalled, F., Mangani, L., \& Darwish, M. (2016). \emph{The Finite Volume Method in Computational Fluid Dynamics: An Advanced Introduction with OpenFOAM® and Matlab®}. Springer.
+
+\bibitem{butcher2016numerical}
+Butcher, J. C. (2016). \emph{Numerical Methods for Ordinary Differential Equations} (3rd ed.). John Wiley \& Sons.
+
+\bibitem{wesseling2001principles}
+Wesseling, P. (2001). \emph{Principles of Computational Fluid Dynamics}. Springer.
+
+\bibitem{leonard1979stable}
+Leonard, B. P. (1979). A stable and accurate convective modelling procedure based on quadratic upstream interpolation. \emph{Computer Methods in Applied Mechanics and Engineering}, 19(1), 59-98.
+
+\bibitem{leonard1991ultimate}
+Leonard, B. P. (1991). The ULTIMATE conservative difference scheme applied to unsteady one-dimensional advection. \emph{Computer Methods in Applied Mechanics and Engineering}, 88(1), 17-74.
+
+\bibitem{thompson1999handbook}
+Thompson, J. F., Soni, B. K., \& Weatherill, N. P. (1999). \emph{Handbook of Grid Generation}. CRC Press.
+
+\bibitem{knupp1993fundamentals}
+Knupp, P. M., \& Steinberg, S. (1993). \emph{Fundamentals of Grid Generation}. CRC Press.
+
+\bibitem{roache1998verification}
+Roache, P. J. (1998). \emph{Verification and Validation in Computational Science and Engineering}. Hermosa Publishers.
+
+\bibitem{schroeder2006visualization}
+Schroeder, W., Martin, K., \& Lorensen, B. (2006). \emph{The Visualization Toolkit: An Object-Oriented Approach to 3D Graphics} (4th ed.). Kitware.
+
+\bibitem{hansen2011visualization}
+Hansen, C. D., \& Johnson, C. R. (2011). \emph{Visualization Handbook}. Academic Press.
+
+\bibitem{openfoam2022guide}
+OpenFOAM Foundation. (2022). \emph{OpenFOAM User Guide}. The OpenFOAM Foundation.
+
+\bibitem{greenshields2020openfoam}
+Greenshields, C. J. (2020). \emph{OpenFOAM User Guide}. The OpenFOAM Foundation.
+
+\bibitem{jasak1996error}
+Jasak, H. (1996). \emph{Error Analysis and Estimation in the Finite Volume Method with Applications to Fluid Flows}. PhD Thesis, Imperial College London.
+
+\bibitem{rusche2002computational}
+Rusche, H. (2002). \emph{Computational Fluid Dynamics of Dispersed Two-Phase Flows at High Phase Fractions}. PhD Thesis, Imperial College London.
+
+\bibitem{patankar1972calculation}
+Patankar, S. V., \& Spalding, D. B. (1972). A calculation procedure for heat, mass and momentum transfer in three-dimensional parabolic flows. \emph{International Journal of Heat and Mass Transfer}, 15(10), 1787-1806.
+
+\bibitem{caretto1973two}
+Caretto, L. S., Gosman, A. D., Patankar, S. V., \& Spalding, D. B. (1973). Two calculation procedures for steady, three-dimensional flows with recirculation. \emph{Proceedings of the Third International Conference on Numerical Methods in Fluid Mechanics}, 60-68.
+
+\bibitem{issa1986solution}
+Issa, R. I. (1986). Solution of the implicitly discretised fluid flow equations by operator-splitting. \emph{Journal of Computational Physics}, 62(1), 40-65.
+
+\bibitem{holzmann2017mathematics}
+Holzmann, T. (2017). \emph{Mathematics, Numerics, Derivations and OpenFOAM®}. Holzmann CFD.
+
+\bibitem{courant1928uber}
+Courant, R., Friedrichs, K., \& Lewy, H. (1928). Über die partiellen Differenzengleichungen der mathematischen Physik. \emph{Mathematische Annalen}, 100(1), 32-74.
+
+\bibitem{leveque2007finite}
+LeVeque, R. J. (2007). \emph{Finite Difference Methods for Ordinary and Partial Differential Equations}. SIAM.
+
+\bibitem{trefethen1996finite}
+Trefethen, L. N. (1996). \emph{Finite Difference and Spectral Methods for Ordinary and Partial Differential Equations}. Cornell University.
+
+\bibitem{greenshields2020constant}
+Greenshields, C. J. (2020). \emph{OpenFOAM User Guide - Constant Directory}. The OpenFOAM Foundation.
+
+\bibitem{openfoam2022boundary}
+OpenFOAM Foundation. (2022). \emph{OpenFOAM v10 User Guide - Boundary Conditions}. The OpenFOAM Foundation.
+
+\bibitem{ahrens2005paraview}
+Ahrens, J., Geveci, B., \& Law, C. (2005). ParaView: An end-user tool for large-data visualization. \emph{The Visualization Handbook}, 717-731.
+
+\bibitem{ayachit2015paraview}
+Ayachit, U. (2015). \emph{The ParaView Guide: A Parallel Visualization Application}. Kitware.
+
+\bibitem{hirt1981volume}
+Hirt, C. W., \& Nichols, B. D. (1981). Volume of fluid (VOF) method for the dynamics of free boundaries. \emph{Journal of Computational Physics}, 39(1), 201-225.
+
+\bibitem{rider1998reconstructing}
+Rider, W. J., \& Kothe, D. B. (1998). Reconstructing volume tracking. \emph{Journal of Computational Physics}, 141(2), 112-152.
+
+\bibitem{scardovelli1999direct}
+Scardovelli, R., \& Zaleski, S. (1999). Direct numerical simulation of free-surface and interfacial flow. \emph{Annual Review of Fluid Mechanics}, 31(1), 567-603.
+
+% Références professionnelles et techniques (documents du barrage)
+\bibitem{scet1994ahl}
+SCET MAROC. (1994). \emph{Étude préliminaire du barrage Ait M'zal}. Direction des Aménagements Hydrauliques.
+
+\bibitem{fiche_synoptique}
+Agence du Bassin Hydraulique du Souss Massa. (s.d.). \emph{Barrage Ahl Souss (Ait M'zal) - Fiche synoptique}.
+
+\bibitem{fiche_historique}
+Agence du Bassin Hydraulique du Souss Massa. (s.d.). \emph{Barrage Ahl Souss (Ait M'zal) - Fiche historique}.
+
+\bibitem{donnees_hydrologiques}
+Agence du Bassin Hydraulique du Souss Massa. (s.d.). \emph{Barrage Ahl Souss (Ait M'zal) - Données hydrologiques}.
+
+\bibitem{note_geologique_2003}
+Agence du Bassin Hydraulique du Souss Massa. (2003). \emph{Barrage Ait M'zal - Note de synthèse géologique et géotechnique n°5}.
+
+\bibitem{fiche_organes_restitution}
+Agence du Bassin Hydraulique du Souss Massa. (s.d.). \emph{Barrage Ahl Souss (Ait M'zal) - Fiche organes de restitution}.
+
+\bibitem{bilans_apports}
+Agence du Bassin Hydraulique du Souss Massa. (s.d.). \emph{Barrage Ahl Souss (Ait M'zal) - Bilans, fournitures, apports, bathymétrie}.
+
+\bibitem{note_calcul_evacuateur}
+Agence du Bassin Hydraulique du Souss Massa. (s.d.). \emph{Barrage Ahl Souss (Ait M'zal) - Note de calcul de l'évacuateur de crues}.
+
+\bibitem{note_calcul_vidange}
+Agence du Bassin Hydraulique du Souss Massa. (s.d.). \emph{Barrage Ahl Souss (Ait M'zal) - Note de calcul de la vidange de fond}.
+
+% Références sur les logiciels
+\bibitem{galland1991telemac}
+Galland, J. C., Goutal, N., \& Hervouet, J. M. (1991). TELEMAC: A new numerical model for solving shallow water equations. \emph{Advances in Water Resources}, 14(3), 138-148.
+
+\bibitem{hervouet2007hydrodynamics}
+Hervouet, J. M. (2007). \emph{Hydrodynamics of Free Surface Flows: Modelling with the Finite Element Method}. John Wiley \& Sons.
+
+\bibitem{flow2016user}
+Flow Science. (2016). \emph{FLOW-3D User Manual, Version 11.2}. Flow Science, Inc.
+
+\bibitem{ansys2020fluent}
+ANSYS. (2020). \emph{ANSYS Fluent User's Guide}. ANSYS Inc.
+
+\bibitem{matsson2022introduction}
+Matsson, J. E. (2022). \emph{An Introduction to ANSYS Fluent 2022}. SDC Publications.
+
+\bibitem{chen1998lattice}
+Chen, S., \& Doolen, G. D. (1998). Lattice Boltzmann method for fluid flows. \emph{Annual Review of Fluid Mechanics}, 30(1), 329-364.
+
+\bibitem{kruger2017lattice}
+Krüger, T., Kusumaatmaja, H., Kuzmin, A., Shardt, O., Silva, G., \& Viggen, E. M. (2017). \emph{The Lattice Boltzmann Method: Principles and Practice}. Springer.
+
+\bibitem{cd2019star}
+CD-adapco. (2019). \emph{STAR-CCM+ User Guide}. Siemens PLM Software.
+
+\bibitem{peric2005advantage}
+Perić, M., \& Ferguson, S. (2005). The advantage of polyhedral meshes. \emph{Technical Report, CD-adapco}.
+
+\bibitem{weller1998tensorial}
+Weller, H. G., Tabor, G., Jasak, H., \& Fureby, C. (1998). A tensorial approach to computational continuum mechanics using object-oriented techniques. \emph{Computers in Physics}, 12(6), 620-631.
+
+\bibitem{jasak2009openfoam}
+Jasak, H. (2009). OpenFOAM: Open source CFD in research and industry. \emph{International Journal of Naval Architecture and Ocean Engineering}, 1(2), 89-94.
+
+\bibitem{simscale2021documentation}
+SimScale GmbH. (2021). \emph{SimScale Documentation}. SimScale GmbH.
+
+\bibitem{bletzinger2017cloud}
+Bletzinger, K. U., \& Wüchner, R. (2017). Cloud-based simulation in engineering. \emph{Proceedings of the 7th GACM Colloquium on Computational Mechanics}.
+
+\bibitem{dhi2020mike}
+DHI. (2020). \emph{MIKE 21 \& MIKE 3 Flow Model FM - User Guide}. DHI Group.
+
+\bibitem{comsol2021reference}
+COMSOL. (2021). \emph{COMSOL Multiphysics Reference Manual}. COMSOL AB.
+
+\bibitem{autodesk2021revit}
+Autodesk. (2021). \emph{Autodesk Revit User Guide}. Autodesk Inc.
+
+\bibitem{eastman2011bim}
+Eastman, C., Teicholz, P., Sacks, R., \& Liston, K. (2011). \emph{BIM Handbook: A Guide to Building Information Modeling for Owners, Managers, Designers, Engineers and Contractors} (2nd ed.). John Wiley \& Sons.
+
+\bibitem{kensek2014building}
+Kensek, K., \& Noble, D. (2014). \emph{Building Information Modeling: BIM in Current and Future Practice}. John Wiley \& Sons.
+
+\bibitem{szalapaj2005contemporary}
+Szalapaj, P. (2005). \emph{Contemporary Architecture and the Digital Design Process}. Architectural Press.
+
+\bibitem{krygiel2008green}
+Krygiel, E., \& Nies, B. (2008). \emph{Green BIM: Successful Sustainable Design with Building Information Modeling}. Sybex.
+
+\end{thebibliography}
+\end{document}

@@ -64,7 +64,7 @@
 \usepackage{tocloft}
 \usepackage{calligra} % Police calligraphique pour les signatures
 \usepackage{pdfpages}
-% \usepackage{bidi} % Désactivé : cause conflit avec tabular dans la page de garde (XeTeX gère le RTL nativement)
+% bidi chargé après maketitle via AtBeginDocument pour éviter conflit tabular
 
 % --- Configuration pour la Basmala (Ayah Coranique) ---
 \definecolor{ayahgold}{RGB}{197, 160, 89}

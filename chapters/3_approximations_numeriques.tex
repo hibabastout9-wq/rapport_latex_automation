@@ -188,10 +188,10 @@ L'équation générale de transport pour une variable \( \phi \) s'écrit sous f
       % --- (c) Cell-vertex ---
       \begin{scope}[xshift=9.0cm]
         \draw[gray!70, thin] (0,0) grid (3,3);
-        % Grand volume de contr\^ole (comme dans l'original)
-        \fill[blue!20] (1,0) rectangle (3,3);
-        \draw[blue, thick] (1,0) rectangle (3,3);
-        % Points uniquement aux sommets (vertices)
+        % Un seul carré encadré par 4 noeuds voisins
+        \fill[blue!20] (1,1) rectangle (2,2);
+        \draw[blue, thick] (1,1) rectangle (2,2);
+        % Points aux sommets (vertices)
         \foreach \x in {0,1,2,3} {
           \foreach \y in {0,1,2,3} {
             \fill (\x,\y) circle (4pt);

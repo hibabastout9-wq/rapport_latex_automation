@@ -94,46 +94,48 @@ Le tableau suivant regroupe les principales caractéristiques des logiciels pré
     \end{tabular}}
 \end{table}
 
-% SECTION 5.4 : LE LOGICIEL AUTODESK REVIT
-\section{Le logiciel Autodesk Revit}
-\label{sec:revit}
+% SECTION 5.4 : LE LOGICIEL SKETCHUP
+\section{Le logiciel SketchUp}
+\label{sec:sketchup}
 
-Bien que n'étant pas un logiciel de CFD, Autodesk Revit joue un rôle important dans la chaîne de modélisation pour la création de la géométrie.
+Bien que n'étant pas un logiciel de CFD, SketchUp joue un rôle important dans la chaîne de modélisation pour la création de la géométrie. Dans notre démarche, les profils types 2D des ouvrages ont d'abord été réalisés sous \textbf{AutoCAD}, puis importés dans SketchUp afin de servir de base à la modélisation 3D.
 
 \subsection{Présentation du logiciel}
-\label{subsec:presentation_revit}
+\label{subsec:presentation_sketchup}
 
-Autodesk Revit est un logiciel de \textbf{BIM (Building Information Modeling)} dédié à l'architecture, l'ingénierie et la construction. Contrairement aux logiciels de CAO traditionnels (comme AutoCAD) qui manipulent des entités géométriques indépendantes (lignes, cercles), Revit travaille avec des \textbf{objets paramétriques intelligents} \cite{autodesk2021revit, eastman2011bim}. Un mur, une fenêtre, une poutre ne sont pas de simples dessins, mais des objets qui contiennent des informations (matériau, dimensions, fonction) et des relations avec les autres objets.
+SketchUp est un logiciel de modélisation 3D développé par Trimble Inc., reconnu pour la simplicité et l'intuitivité de son interface \cite{trimble2023sketchup, brightman2018sketchup}. Contrairement aux logiciels BIM paramétriques (comme Revit), SketchUp repose sur une modélisation directe à base de faces et d'arêtes, manipulées à l'aide d'outils simples tels que ``Pousser/Tirer'' (Push/Pull), ``Suivez-moi'' ou encore les outils de mise à l'échelle et de rotation. Les éléments peuvent être organisés en \textbf{groupes} et \textbf{composants}, ce qui permet de structurer le modèle et de réutiliser des éléments identiques.
 
 \subsection{Intérêt pour la modélisation des ouvrages hydrauliques}
-\label{subsec:interet_revit}
+\label{subsec:interet_sketchup}
 
-Pour la modélisation des ouvrages hydrauliques complexes comme le barrage Ahl Souss, Revit présente plusieurs avantages significatifs :
+Pour la modélisation des ouvrages hydrauliques comme le barrage Ahl Souss, SketchUp présente plusieurs avantages significatifs :
 
 \begin{itemize}
-    \item \textbf{Modélisation paramétrique} : Les éléments du barrage (corps du barrage, seuil Creager, coursier, conduites de vidange, murs bajoyers, prises d'eau) peuvent être créés avec des paramètres dimensionnels. Si une cote change, tout le modèle se met à jour automatiquement, garantissant la cohérence géométrique \cite{kensek2014building}.
-    \item \textbf{Exportation vers les formats CAO standards} : Revit permet d'exporter les modèles 3D vers de nombreux formats, notamment le format \textbf{STL (Standard Tessellation Language)} \cite{szalapaj2005contemporary}. Ce format, qui décrit une géométrie par un maillage de triangles, est compatible avec la plupart des logiciels de CFD, dont OpenFOAM.
-    \item \textbf{Intégration BIM} : La maquette numérique ne se limite pas à la géométrie ; elle peut intégrer des données essentielles pour la gestion de l'ouvrage (volumes de béton par zone, type de matériau, dates de construction, etc.).
-    \item \textbf{Coordination multidisciplinaire} : Dans un projet de barrage, plusieurs corps d'état interviennent (génie civil, hydromécanique, instrumentation). Revit permet de coordonner tous ces acteurs autour d'un modèle unique et partagé, réduisant les risques d'erreur et d'incohérence.
+    \item \textbf{Rapidité et simplicité de modélisation} : les outils de modélisation directe (Pousser/Tirer, Suivez-moi) permettent de générer rapidement des géométries complexes (corps du barrage, seuil Creager, coursier, conduites de vidange, murs bajoyers, prises d'eau) à partir de profils 2D \cite{brightman2018sketchup}.
+    \item \textbf{Modélisation du terrain naturel} : l'outil \textit{Sandbox} de SketchUp permet de générer une surface topographique (TIN) directement à partir des courbes de niveau, facilitant l'intégration du terrain naturel dans le modèle global.
+    \item \textbf{Organisation en groupes et composants} : chaque élément de l'ouvrage peut être isolé dans un groupe ou un composant dédié, ce qui simplifie les modifications et la gestion des différentes parties du modèle.
+    \item \textbf{Exportation vers les formats CAO standards} : grâce à l'extension \textbf{SketchUp STL}, les modèles 3D peuvent être exportés au format \textbf{STL (Standard Tessellation Language)} \cite{lhuillier2014sketchupstl}. Ce format, qui décrit une géométrie par un maillage de triangles, est compatible avec la plupart des logiciels de CFD, dont OpenFOAM.
+    \item \textbf{Accessibilité} : SketchUp est disponible en version gratuite (SketchUp Free, en ligne) et en version professionnelle à coût modéré, ce qui en fait un outil accessible pour des projets académiques.
 \end{itemize}
 
 \subsection{Démarche de modélisation}
-\label{subsec:demarche_revit}
+\label{subsec:demarche_sketchup}
 
-Le processus de modélisation avec Revit pour notre étude comprend les étapes suivantes :
+Le processus de modélisation pour notre étude comprend les étapes suivantes :
 \begin{enumerate}
-    \item Création d'un projet Revit avec les unités appropriées (mètres).
-    \item Modélisation du terrain naturel à partir des données topographiques (courbes de niveau).
-    \item Création du corps du barrage par extrusion du profil type (paramètres : cote de fondation, fruit des parements, largeur en crête).
-    \item Modélisation de l'évacuateur de crues (seuil Creager, coursier, cuillère).
+    \item Réalisation du profil type 2D du barrage (cote de fondation, fruit des parements, largeur en crête) et de l'évacuateur de crues sous \textbf{AutoCAD}.
+    \item Importation du profil 2D AutoCAD dans un projet SketchUp avec les unités appropriées (mètres).
+    \item Modélisation du terrain naturel à l'aide de l'outil \textit{Sandbox} à partir des données topographiques (courbes de niveau).
+    \item Création du corps du barrage par extrusion (Pousser/Tirer) du profil type importé depuis AutoCAD.
+    \item Modélisation de l'évacuateur de crues (seuil Creager, coursier, cuillère) à l'aide des outils de courbes et de l'outil \textit{Suivez-moi}.
     \item Modélisation de la vidange de fond (conduites, chambre des vannes, bassin de dissipation).
     \item Modélisation des prises d'eau et de la galerie.
-    \item Exportation au format STL pour une utilisation dans OpenFOAM \cite{krygiel2008green}.
+    \item Exportation au format STL via l'extension SketchUp STL pour une utilisation dans OpenFOAM \cite{lhuillier2014sketchupstl}.
 \end{enumerate}
 
 % SECTION 5.5 : CONCLUSION
 \section{Conclusion}
 \label{sec:conclusion_benchmark}
 
-Le choix d'OpenFOAM pour cette étude se justifie par plusieurs avantages : sa gratuité, l'accès au code source permettant une transparence totale et une flexibilité maximale, sa capacité de calcul parallèle (HPC) pour traiter des géométries complexes, et sa large communauté d'utilisateurs qui garantit un support et un partage de connaissances. Sa structure modulaire permet d'adapter précisément les modèles physiques aux spécificités des ouvrages du barrage Ahl Souss. Associé à Autodesk Revit pour la modélisation géométrique paramétrique, cet ensemble d'outils constitue une chaîne de simulation complète, performante et économiquement accessible.
+Le choix d'OpenFOAM pour cette étude se justifie par plusieurs avantages : sa gratuité, l'accès au code source permettant une transparence totale et une flexibilité maximale, sa capacité de calcul parallèle (HPC) pour traiter des géométries complexes, et sa large communauté d'utilisateurs qui garantit un support et un partage de connaissances. Sa structure modulaire permet d'adapter précisément les modèles physiques aux spécificités des ouvrages du barrage Ahl Souss. Associé à SketchUp pour la modélisation géométrique 3D, cet ensemble d'outils constitue une chaîne de simulation complète, performante et économiquement accessible.
 

@@ -3,6 +3,14 @@
 # Script de compilation LaTeX avec gestion d'erreurs
 set -e
 
+# Sérialisation: une seule compilation à la fois (évite les fichiers SAVE-ERROR biber)
+LOCK_FILE=/tmp/latex-compile.lock
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+    echo "[SKIP] Une compilation est déjà en cours. Ignoré."
+    exit 0
+fi
+
 # Mode rapide (watch): conserve les fichiers auxiliaires pour des recompilations beaucoup plus rapides
 FAST_MODE=0
 CLEAN_ON_SUCCESS=1

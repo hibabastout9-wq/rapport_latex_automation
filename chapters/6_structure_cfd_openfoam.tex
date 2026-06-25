@@ -1,16 +1,63 @@
 % ============================================================
-%  CHAPITRE 7 : Structure générale d'un cas OpenFOAM
+%  CHAPITRE 6 : Structure d'un code CFD et d'un cas OpenFOAM
 % ============================================================
-\chapter{Structure générale d'un cas OpenFOAM}
-\label{chap:structure_openfoam}
+\chapter{Structure d'un code CFD et d'un cas OpenFOAM}
+\label{chap:structure_cfd_openfoam}
 
-% SECTION 7.1 : INTRODUCTION
+% SECTION : INTRODUCTION
 \section{Introduction}
-\label{sec:introduction_openfoam}
+\label{sec:introduction_structure_cfd_openfoam}
+
+La mécanique des fluides numérique (CFD) permet de simuler des écoulements complexes en résolvant numériquement les équations de conservation. Pour cela, un code CFD suit une structure bien définie, articulée autour de trois étapes principales : le pré-traitement, la résolution et le post-traitement \cite{wendt2009computational}. Chacune de ces phases est indispensable pour garantir la fiabilité des résultats, depuis la préparation du modèle jusqu'à l'analyse des données simulées.
+
+Ce chapitre présente dans un premier temps cette structure générale, puis détaille la manière dont OpenFOAM l'implémente concrètement : son organisation de fichiers, ses solveurs, ses algorithmes de résolution numérique, ainsi que ses outils de visualisation et de post-traitement.
+
+% SECTION : STRUCTURE GÉNÉRALE D'UN CODE CFD
+\section{Structure générale d'un code CFD}
+\label{sec:structure_generale_code_cfd}
+
+\subsection{Pré-traitement (Pre-processing)}
+\label{subsec:preprocessing}
+
+Cette étape consiste à préparer les données nécessaires à la simulation. Cela inclut la définition du domaine géométrique sous forme maillée, le choix des phénomènes physiques à modéliser (comme la turbulence, les écoulements multiphasiques ou la cavitation), ainsi que la spécification des propriétés physiques du fluide et des conditions aux limites adaptées au cas étudié \cite{thompson1999handbook}. Les grandeurs à calculer, telles que la vitesse, la pression et la température, sont associées aux nœuds de chaque cellule du maillage.
+
+La qualité du maillage est cruciale pour la précision des résultats. Les paramètres clés incluent la résolution spatiale, la qualité des cellules (skewness, orthogonalité) et le raffinement local dans les zones à forts gradients \cite{knupp1993fundamentals}.
+
+\subsection{Résolution (Processing)}
+\label{subsec:processing}
+
+Le rôle du solveur est d'appliquer les algorithmes permettant \cite{patankar1980numerical} :
+\begin{itemize}
+    \item D'intégrer les équations de conservation sur chaque volume de contrôle.
+    \item De transformer ces équations intégrales en un système algébrique.
+    \item D'en estimer la solution à l'aide de méthodes itératives.
+\end{itemize}
+
+La majorité des logiciels de CFD, dont OpenFOAM, utilise la méthode des \textbf{volumes finis}, qui repose sur l'application directe des bilans sur chaque volume de contrôle. Cette approche est largement adoptée en raison de sa rigueur et de son efficacité, ce qui explique son succès auprès des éditeurs de logiciels de simulation numérique \cite{versteeg2007introduction}.
+
+\subsection{Post-traitement (Post-processing)}
+\label{subsec:postprocessing}
+
+Le post-traitement vise avant tout à évaluer la qualité de la solution obtenue. Il s'agit notamment de vérifier si cette solution est indépendante de la taille du maillage, du critère de convergence et des schémas numériques utilisés \cite{roache1998verification}. Il est également essentiel de s'assurer que le modèle de turbulence ainsi que les conditions aux limites ont été choisis de manière pertinente, et d'analyser dans quelle mesure les résultats dépendent de ces choix.
+
+En général, le solveur fournit une grande quantité de données brutes, telles que les champs de vitesse (u, v, w), de pression (p), etc., pour chaque point du maillage. Ces données doivent être converties en représentations visuelles afin de faciliter leur analyse et leur compréhension \cite{schroeder2006visualization}.
+
+Les principaux résultats généralement présentés lors du post-traitement sont les suivants \cite{hansen2011visualization} :
+\begin{itemize}
+    \item La représentation de la géométrie du domaine et des détails du maillage.
+    \item L'évolution de la convergence au cours des itérations (graphique des résidus).
+    \item Les champs et profils de vitesse (contours, vecteurs, lignes de courant).
+    \item Les tracés des distributions de pression.
+    \item Les animations et visualisations dynamiques des écoulements simulés.
+\end{itemize}
+
+% SECTION : STRUCTURE GÉNÉRALE D'UN CAS OPENFOAM
+\section{Structure générale d'un cas OpenFOAM}
+\label{sec:structure_openfoam}
 
 OpenFOAM adopte une structure de fichiers standardisée, organisée de manière logique pour séparer les différents aspects du cas \cite{openfoam2022guide}. Cette hiérarchie de fichiers facilite la lisibilité, la modification et l'automatisation des cas de calcul. Un cas OpenFOAM comprend trois répertoires principaux : \textbf{``0''}, \textbf{``constant''} et \textbf{``system''} \cite{greenshields2020openfoam}.
 
-% SECTION 7.2 : LES SOLVEURS DISPONIBLES DANS OPENFOAM
+% SECTION : LES SOLVEURS DISPONIBLES DANS OPENFOAM
 \section{Les solveurs disponibles dans OpenFOAM}
 \label{sec:solveurs_openfoam}
 
@@ -54,7 +101,7 @@ OpenFOAM propose une vaste bibliothèque de solveurs classés par type d'écoule
 
 Pour notre étude, le solveur \textbf{interFoam} est choisi car il est spécifiquement conçu pour les écoulements diphasiques incompressibles avec suivi d'interface par la méthode VOF \cite{rusche2002computational}, ce qui est parfait pour modéliser la surface libre de l'eau dans l'évacuateur de crues.
 
-% SECTION 7.3 : LES ALGORITHMES DE RÉSOLUTION NUMÉRIQUE
+% SECTION : LES ALGORITHMES DE RÉSOLUTION NUMÉRIQUE
 \section{Les algorithmes de résolution numérique}
 \label{sec:algorithmes_resolution}
 
@@ -75,7 +122,7 @@ L'algorithme PISO (Pressure Implicit with Splitting of Operator) est spécifique
 
 L'algorithme PIMPLE combine les deux approches, PISO et SIMPLE. Il s'agit d'une implémentation de l'algorithme PISO avec la possibilité d'utiliser un facteur de sous-relaxation (comme dans SIMPLE) et d'effectuer des itérations externes à l'intérieur d'un même pas de temps. Cela permet d'utiliser des pas de temps plus grands que ceux imposés par la condition de Courant, améliorant ainsi l'efficacité pour les simulations transitoires avec des maillages complexes \cite{holzmann2017mathematics}.
 
-% SECTION 7.4 : STABILITÉ ET CONVERGENCE DES CALCULS
+% SECTION : STABILITÉ ET CONVERGENCE DES CALCULS
 \section{Stabilité et convergence des calculs}
 \label{sec:stabilite_convergence}
 
@@ -109,7 +156,7 @@ Co = \frac{|U| \cdot \Delta t}{\Delta x}
 
 La condition de stabilité s'exprime par \( Co \leq 1 \), garantissant que l'information (une particule fluide) ne parcourt pas plus d'une cellule à chaque pas de temps \cite{trefethen1996finite}. Pour les schémas implicites, la condition est moins restrictive, mais un Co trop grand peut encore dégrader la précision.
 
-% SECTION 7.5 : LE SYSTÈME DE FICHIERS D'OPENFOAM
+% SECTION : LE SYSTÈME DE FICHIERS D'OPENFOAM
 \section{Le système de fichiers d'OpenFOAM}
 \label{sec:fichiers_openfoam}
 
@@ -176,7 +223,7 @@ Le dossier ``system'' contient les fichiers de contrôle de la simulation \cite{
     \item \textbf{\texttt{decomposeParDict}} : configuration du calcul parallèle (décomposition du domaine).
 \end{itemize}
 
-% SECTION 7.6 : OUTIL DE VISUALISATION ET DE POST-TRAITEMENT (PARAVIEW)
+% SECTION : OUTIL DE VISUALISATION ET DE POST-TRAITEMENT (PARAVIEW)
 \section{Outil de visualisation et de post-traitement (ParaView)}
 \label{sec:paraview}
 
@@ -184,7 +231,7 @@ Le dossier ``system'' contient les fichiers de contrôle de la simulation \cite{
 
 Cet outil très puissant permet d'afficher divers types de données tels que des champs scalaires (pression, température), des vecteurs (vitesse), des lignes de courant ou encore des surfaces de niveau (pour la surface libre avec \texttt{alpha.water}) \cite{ayachit2015paraview}. Il facilite la création d'animations pour visualiser l'évolution des phénomènes simulés.
 
-% SECTION 7.7 : MODÉLISATION DE LA SURFACE LIBRE - MÉTHODE VOF
+% SECTION : MODÉLISATION DE LA SURFACE LIBRE - MÉTHODE VOF
 \section{Modélisation de la surface libre - Méthode VOF}
 \label{sec:vof}
 
@@ -211,10 +258,12 @@ Les propriétés du fluide (masse volumique \(\rho\) et viscosité \(\mu\)) sont
 
 Le solveur \texttt{interFoam} d'OpenFOAM implémente cette méthode avec des techniques avancées de compression de l'interface pour maintenir sa netteté.
 
-% SECTION 7.8 : CONCLUSION
+% SECTION : CONCLUSION
 \section{Conclusion}
-\label{sec:conclusion_openfoam}
+\label{sec:conclusion_structure_cfd_openfoam}
 
-Ce chapitre a permis d'explorer la structure d'un cas de modélisation dans OpenFOAM, en abordant les différents solveurs disponibles, les algorithmes de résolution numérique (SIMPLE, PISO, PIMPLE), ainsi que les notions essentielles de stabilité et de convergence des calculs. L'organisation des dossiers du logiciel a également été examinée, mettant en lumière la clarté et la logique qui facilitent la gestion des simulations. La méthode VOF, implémentée dans le solveur \texttt{interFoam}, est l'outil idéal pour notre modélisation de l'écoulement dans l'évacuateur de crues.
+La simulation CFD repose sur trois étapes essentielles : le pré-traitement, la résolution et le post-traitement. Chacune joue un rôle clé dans la qualité et l'interprétation des résultats. Une bonne préparation du modèle, un solveur fiable et une analyse rigoureuse garantissent des simulations précises et exploitables.
+
+Ce chapitre a également permis d'explorer la manière dont OpenFOAM met en œuvre cette structure générale, en abordant les différents solveurs disponibles, les algorithmes de résolution numérique (SIMPLE, PISO, PIMPLE), ainsi que les notions essentielles de stabilité et de convergence des calculs. L'organisation des dossiers du logiciel a également été examinée, mettant en lumière la clarté et la logique qui facilitent la gestion des simulations. La méthode VOF, implémentée dans le solveur \texttt{interFoam}, est l'outil idéal pour notre modélisation de l'écoulement dans l'évacuateur de crues.
 
 Il ressort de cette étude que la richesse des solveurs et des algorithmes proposés par OpenFOAM permet de traiter une large gamme de problématiques en mécanique des fluides numérique. Le respect des critères de stabilité et de convergence reste essentiel pour garantir la qualité et la fiabilité des résultats obtenus.

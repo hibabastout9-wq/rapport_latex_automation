@@ -19,9 +19,10 @@
 }
 \soutenance{Juin 2026}
 \jury{
-    \hspace{0.5cm}$\blacktriangleright$ Mme. xxxxx (EHTP) \dotfill Présidente\\[0.1cm]
-    \hspace{0.5cm}$\blacktriangleright$ M. xxxxx (EHTP) \dotfill Rapporteur\\[0.1cm]
-    \hspace{0.5cm}$\blacktriangleright$ M. xxxxx (CID Développement) \dotfill Examinateur
+    \hspace{0.5cm}$\blacktriangleright$ Mme. AOUICHE Ismail (EHTP) \dotfill Présidente\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ Mme. AHATTAB Jihane (EHTP) \dotfill Rapporteur\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ M. SOULI Hamza \dotfill Examinateur\\[0.1cm]
+    \hspace{0.5cm}$\blacktriangleright$ M. BENAZIZ Youssef (LPTP) \dotfill Examinateur
 }
 \academicyear{\textbf{2025 - 2026}}
 
@@ -62,6 +63,14 @@
 \usepackage{enumitem}
 \usepackage{tocloft}
 \usepackage{calligra} % Police calligraphique pour les signatures
+\usepackage{pdfpages}
+\usepackage{bidi}
+
+% --- Configuration pour la Basmala (Ayah Coranique) ---
+\definecolor{ayahgold}{RGB}{197, 160, 89}
+\definecolor{ayahblue}{RGB}{31, 73, 125}
+\definecolor{ayahgray}{RGB}{128, 128, 128}
+\newfontfamily\ayahfont[Script=Arabic,Scale=1.3]{Amiri Quran}
 
 % =======================================================
 % CONFIGURATION TABLE DES MATIERES (Style PFE)
@@ -216,6 +225,9 @@
 \thispagestyle{empty}
 \hypersetup{pageanchor=true}
 
+% --- Page de la Basmala ---
+\input{chapters/0_basmala}
+
 \newpage
 \thispagestyle{empty}
 \mbox{}
@@ -266,11 +278,19 @@
 
 \input{chapters/5_benchmark_logiciels}
 
-% --- TROISIÈME PARTIE : DESCRIPTION D'OPENFOAM ---
-\part{TROISIÈME PARTIE : DESCRIPTION D'OPENFOAM, STRUCTURES, ALGORITHMES ET OUTILS}
+% --- TROISIÈME PARTIE : SIMULATION HYDRAULIQUE ET DIMENSIONNEMENT ---
+\part{TROISIÈME PARTIE : SIMULATION HYDRAULIQUE ET DIMENSIONNEMENT DE L'ÉVACUATEUR DE CRUES}
 
-\input{chapters/6_structure_code_cfd}
-\input{chapters/7_structure_openfoam}
+\input{chapters/6_structure_cfd_openfoam}
+\input{chapters/7_dimensionnement_theorique}
+\input{chapters/8_mise_en_oeuvre_openfoam}
+\input{chapters/9_resultats_simulation}
+
+% --- ANNEXES ---
+\clearpage
+\appendix
+\addcontentsline{toc}{part}{ANNEXES}
+\input{chapters/annexes}
 
 % --- BIBLIOGRAPHIE ---
 \clearpage

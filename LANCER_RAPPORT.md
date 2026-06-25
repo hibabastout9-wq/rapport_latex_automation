@@ -1,6 +1,7 @@
-Analyse_HSE_Chantiers_Routiers_Maroc.pdf
+http://localhost:8082/main.pdf
+docker logs -f rapport-atelier-latex-watch
 
-
+ji l fichier main.log fi 7alate w9i3 mochkile
 
 # Commandes pour lancer le Rapport d'Atelier
 

@@ -1,0 +1,20 @@
+# Sheet 'Crues' UsedRange starts at B1 ; data extent rows=19 cols=9
+								
+								
+								
+								
+		T (ans)	Qp (m^3/s)					
+		10	220					
+		100	520					
+		1000	820					
+		5000	1030					
+								
+							Temps de concentration 	5h
+								
+								
+								
+								
+	t (en heure)	T=10 ans	T=100 ans	T=1000 ans	T=5000 ans			
+1	0	0	0	0	0	1		
+2	5	220	520	820	1030	2		
+3	10	0	0	0	0	3		

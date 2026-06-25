@@ -1,0 +1,79 @@
+﻿\section{Introduction}
+\section{Les équations de base de la mécanique des fluides}
+\subsection{L'équation de continuité}
+\subsection{L'équation de conservation de la quantité de mouvement}
+\section{Avantages de la CFD par rapport aux études expérimentales}
+\section{Conclusion}
+\section{Introduction}
+\section{Les approches de modélisation de la turbulence}
+\subsection{Simulation numérique directe (DNS)}
+\subsection{Simulation des grandes échelles (LES)}
+\subsection{Modélisation statistique (RANS)}
+\subsection{Remarques sur les trois approches}
+\section{Classification des modèles de turbulence}
+\subsection{Modèle à viscosité turbulente}
+\subsection{Le modèle de longueur de mélange -- modèle de Prandtl}
+\section{Modèles de fermeture des approches statistiques à deux équations de transport}
+\subsection{Modèle de fermeture \texorpdfstring{$k$-$\varepsilon$}{k-epsilon}}
+\subsection{Modèle de fermeture \( k-\omega \)}
+\subsection{Modèle de fermeture \( k-\omega \) SST}
+\section{Conclusion}
+\section{Introduction}
+\section{Méthode des différences finies}
+\section{Méthode des éléments finis}
+\section{Méthode des volumes finis}
+\subsection{Discrétisation des termes de l'équation de transport}
+\subsection{Les schémas de discrétisation}
+\section{Conclusion}
+\section{Introduction}
+\section{Situation et accès}
+\section{But de l'ouvrage}
+\section{Contexte géologique}
+\section{Caractéristiques hydrologiques}
+\section{Caractéristiques de la retenue}
+\section{Caractéristiques principales du barrage}
+\section{Description de l'évacuateur de crues}
+\section{Description de la vidange de fond}
+\section{Description des prises d'eau (AEP et agricole)}
+\section{Description de la galerie d'injection et de drainage}
+\section{Description de la dérivation provisoire}
+\section{Aspects particuliers et adaptations en cours de chantier}
+\section{Conclusion}
+\section{Introduction}
+\section{Présentation des logiciels}
+\subsection{TELEMAC-3D}
+\subsection{Flow-3D}
+\subsection{ANSYS Fluent}
+\subsection{XFlow}
+\subsection{STAR-CCM+}
+\subsection{OpenFOAM}
+\subsection{SimScale}
+\subsection{Autres logiciels}
+\section{Comparaison entre les logiciels}
+\section{Le logiciel Autodesk Revit}
+\subsection{Présentation du logiciel}
+\subsection{Intérêt pour la modélisation des ouvrages hydrauliques}
+\subsection{Démarche de modélisation}
+\section{Conclusion}
+\section{Introduction}
+\section{Pré-traitement (Pre-processing)}
+\section{Résolution (Processing)}
+\section{Post-traitement (Post-processing)}
+\section{Conclusion}
+\section{Introduction}
+\section{Les solveurs disponibles dans OpenFOAM}
+\section{Les algorithmes de résolution numérique}
+\subsection{L'algorithme SIMPLE}
+\subsection{L'algorithme PISO}
+\subsection{L'algorithme PIMPLE}
+\section{Stabilité et convergence des calculs}
+\subsection{Définitions}
+\subsection{Paramètres influençant la convergence}
+\subsection{Critères de stabilité}
+\section{Le système de fichiers d'OpenFOAM}
+\subsection{Le dossier ``0''}
+\subsection{Le dossier ``constant''}
+\subsection{Le dossier ``system''}
+\section{Outil de visualisation et de post-traitement (ParaView)}
+\section{Modélisation de la surface libre - Méthode VOF}
+\section{Conclusion}

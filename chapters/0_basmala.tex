@@ -6,11 +6,14 @@
 
 \vspace*{\fill}
 
+\begingroup
+\XeTeXbidi=1
+
 \begin{center}
 
     % ── Basmala ──
     {\ayahfont\fontsize{18}{28}\selectfont
-        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+        \beginR بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ \endR
     }
 
     \vspace{1.6cm}
@@ -26,17 +29,19 @@
 
     % ── L'Ayah ──
     {\ayahfont\fontsize{36}{52}\selectfont\textcolor{ayahblue}
-        ﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾
+        \beginR ﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾ \endR
     }
 
     \vspace{1.8cm}
 
     % ── Référence ──
     {\ayahfont\fontsize{15}{24}\selectfont\textcolor{ayahgray}
-        سورة طه \ —\ الآية 114
+        \beginR سورة طه — الآية 114 \endR
     }
 
 \end{center}
+
+\endgroup
 
 \vspace*{\fill}
 \clearpage
